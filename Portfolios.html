@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolios | LYNETTE ZHANG</title>
+    <style>
+        :root { --font-serif: "Times New Roman", Times, serif; --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { display: flex; min-height: 100vh; }
+        .left-panel { width: 60%; background: #fcfcfc; padding: 60px 80px; display: flex; flex-direction: column; }
+        .right-panel { width: 40%; height: 100vh; position: fixed; right: 0; top: 0; background: #333; }
+        .right-panel img { width: 100%; height: 100%; object-fit: cover; }
+        nav { display: flex; align-items: center; margin-bottom: 60px; }
+        .logo-box { font-family: var(--font-serif); font-weight: bold; font-size: 20px; margin-right: 60px; }
+        .menu { display: flex; gap: 30px; font-family: var(--font-sans); font-size: 14px; color: #666; }
+        .menu a { text-decoration: none; color: inherit; }
+        .menu a:hover, .menu a.active { color: #000; font-weight: bold; }
+
+        /* Portfolios 独有样式 */
+        h1 { font-family: var(--font-serif); font-size: 56px; margin-bottom: 20px; }
+        .filter-bar { display: flex; gap: 20px; margin-bottom: 40px; font-size: 13px; color: #888; font-family: var(--font-sans); flex-wrap: wrap; }
+        .filter-bar span { cursor: pointer; padding-bottom: 2px; border-bottom: 2px solid transparent; }
+        .filter-bar span:hover, .filter-bar span.active { color: #000; border-color: #000; }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2列 */
+            gap: 30px;
+        }
+        .work-item img { width: 100%; height: auto; display: block; margin-bottom: 10px; }
+        .work-title { font-size: 14px; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .left-panel, .right-panel { width: 100%; position: relative; }
+            .right-panel { height: 200px; order: -1; }
+            .left-panel { padding: 20px; }
+            .gallery-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <nav>
+            <div class="logo-box">🎨 LYNETTE</div>
+            <div class="menu">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="portfolios.html" class="active">Portfolios</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+
+        <main>
+            <h1>Portfolios</h1>
+            <p style="color:#666; margin-bottom:30px; font-size:14px;">我的艺术创作以古典主义为根基，融合超现实主义。</p>
+            
+            <div class="filter-bar">
+                <span class="active">全部作品</span>
+                <span>单幅创作</span>
+                <span>情绪系列</span>
+                <span>光影练习</span>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="work-item">
+                    <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?q=80&w=600" alt="Art 1">
+                    <div class="work-title">The Yellow Cloth</div>
+                </div>
+                <div class="work-item">
+                    <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=600" alt="Art 2">
+                    <div class="work-title">Abstract Blue</div>
+                </div>
+                 <div class="work-item">
+                    <img src="https://images.unsplash.com/photo-1580137189272-c9379f8864fd?q=80&w=600" alt="Art 3">
+                    <div class="work-title">Portrait Study</div>
+                </div>
+                <div class="work-item">
+                    <img src="https://images.unsplash.com/photo-1576769399222-19e07297e558?q=80&w=600" alt="Art 4">
+                    <div class="work-title">Ocean View</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="right-panel">
+        <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000" alt="Background">
+    </div>
+
+</body>
+</html>

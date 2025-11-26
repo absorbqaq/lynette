@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | LYNETTE ZHANG</title>
+    <style>
+        :root { --font-serif: "Times New Roman", Times, serif; --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { display: flex; min-height: 100vh; }
+        .left-panel { width: 60%; background: #fcfcfc; padding: 60px 80px; display: flex; flex-direction: column; }
+        .right-panel { width: 40%; height: 100vh; position: fixed; right: 0; top: 0; background: #333; }
+        .right-panel img { width: 100%; height: 100%; object-fit: cover; }
+        nav { display: flex; align-items: center; margin-bottom: 80px; }
+        .logo-box { font-family: var(--font-serif); font-weight: bold; font-size: 20px; margin-right: 60px; }
+        .menu { display: flex; gap: 30px; font-family: var(--font-sans); font-size: 14px; color: #666; }
+        .menu a { text-decoration: none; color: inherit; }
+        .menu a:hover, .menu a.active { color: #000; font-weight: bold; }
+        
+        /* About 独有样式 */
+        h1 { font-family: var(--font-serif); font-size: 56px; margin-bottom: 40px; color: #1a1a1a; }
+        .intro-text { font-family: var(--font-sans); font-size: 16px; line-height: 1.8; color: #555; max-width: 600px; margin-bottom: 20px; }
+        .quote { margin-top: 60px; font-family: var(--font-serif); font-size: 24px; font-style: italic; color: #888; border-left: 3px solid #000; padding-left: 20px; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .left-panel, .right-panel { width: 100%; position: relative; }
+            .right-panel { height: 300px; order: -1; }
+            .left-panel { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="left-panel">
+        <nav>
+            <div class="logo-box">🎨 LYNETTE</div>
+            <div class="menu">
+                <a href="index.html">Home</a>
+                <a href="about.html" class="active">About</a>
+                <a href="portfolios.html">Portfolios</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+
+        <main>
+            <h1>About me</h1>
+            <p class="intro-text">
+                人类与AI的差别在于我们有意识和情感，做不到完全理性。
+                艺术正是感性的产物，我常被生活里的每个瞬间触动，在我画作前，画下人们细腻的情感起伏。
+            </p>
+            <p class="intro-text">
+                My artistic creation is based on classicism, integrating surrealism and capturing the subtle vibrations of human emotions.
+            </p>
+
+            <div class="quote">
+                "An artist should stay for long periods of time at waterfalls..."
+            </div>
+        </main>
+    </div>
+
+    <div class="right-panel">
+        <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1000" alt="About Background">
+    </div>
+
+</body>
+</html>

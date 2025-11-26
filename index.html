@@ -3,233 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LYNETTE ZHANG | Portfolio</title>
+    <title>Home | LYNETTE ZHANG</title>
     <style>
-        /* --- 1. 艺术风格定义 (Zhuwenyu Style) --- */
+        /* --- 全局样式库 (4个页面通用) --- */
         :root {
-            --bg-color: #ffffff;
-            --text-main: #1a1a1a;
-            --text-light: #666666;
-            --font-serif: "Times New Roman", Times, serif; /* 艺术感衬线体 */
-            --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif; /* 现代无衬线体 */
+            --font-serif: "Times New Roman", Times, Georgia, serif; /* 标题字体 */
+            --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif; /* 正文字体 */
+            --theme-color: #bfa480; /* 金棕色点缀 */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: var(--font-sans);
-            line-height: 1.6;
+            display: flex; /* 左右分屏核心 */
+            min-height: 100vh;
         }
 
-        a { text-decoration: none; color: inherit; transition: opacity 0.3s; }
-        a:hover { opacity: 0.5; }
-
-        /* --- 2. 导航栏 (极简) --- */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 40px 60px;
-            position: fixed; /* 固定在顶部 */
-            top: 0;
-            width: 100%;
-            background: rgba(255,255,255,0.95); /* 半透明背景 */
-            z-index: 100;
-        }
-
-        .logo {
-            font-family: var(--font-serif);
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .menu-links {
-            display: flex;
-            gap: 40px;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 500;
-        }
-
-        /* --- 3. 巨幕文字区 (Visual Narratives) --- */
-        .hero {
-            height: 80vh; /* 占据屏幕80%的高度 */
+        /* --- 左侧内容区 (60%宽度) --- */
+        .left-panel {
+            width: 60%;
+            background: #fcfcfc; /* 极淡的灰白色 */
+            padding: 60px 80px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 20px;
-            background-color: #0d0d0d; /* 深色背景 */
-            color: #fff;
         }
 
-        .hero-subtitle {
-            font-size: 14px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            color: #888;
+        /* --- 右侧图片区 (40%宽度，固定不动) --- */
+        .right-panel {
+            width: 40%;
+            height: 100vh;
+            position: fixed;
+            right: 0;
+            top: 0;
+            background-color: #333;
         }
-
-        .hero-title {
-            font-family: var(--font-serif);
-            font-size: 8vw; /* 随屏幕宽度变大 */
-            font-weight: 100; /* 极细字体 */
-            line-height: 1.1;
-            margin-bottom: 40px;
-        }
-
-        .scroll-down {
-            font-size: 12px;
-            margin-top: 60px;
-            opacity: 0.5;
-        }
-
-        /* --- 4. 作品网格 --- */
-        .portfolio-grid {
-            max-width: 1400px;
-            margin: 100px auto;
-            padding: 0 40px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 两列布局 */
-            gap: 80px 40px;
-        }
-
-        .project-item {
-            cursor: pointer;
-        }
-
-        .img-wrap {
-            width: 100%;
-            aspect-ratio: 16/10; /* 宽屏电影感比例 */
-            background-color: #f0f0f0;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .img-wrap img {
+        
+        .right-panel img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.7s ease; /* 缓慢优雅的放大 */
-            filter: grayscale(20%); /* 轻微黑白滤镜，更有质感 */
+            object-fit: cover; /* 铺满不拉伸 */
         }
 
-        .project-item:hover .img-wrap img {
-            transform: scale(1.05);
-            filter: grayscale(0%); /* 鼠标放上去恢复彩色 */
-        }
-
-        .meta {
+        /* --- 导航栏 --- */
+        nav {
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
+            align-items: center;
+            margin-bottom: 120px; /* 导航离内容的距离 */
         }
 
-        .project-title {
+        .logo-box {
             font-family: var(--font-serif);
-            font-size: 24px;
-            font-weight: 400;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 60px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .project-cat {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #999;
+        .menu {
+            display: flex;
+            gap: 30px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: #666;
         }
 
-        /* --- 5. 底部 --- */
-        footer {
-            text-align: center;
-            padding: 80px 0;
-            border-top: 1px solid #eaeaea;
-            font-size: 12px;
+        .menu a { text-decoration: none; color: inherit; transition: 0.3s; }
+        .menu a:hover, .menu a.active { color: #000; font-weight: bold; }
+
+        /* --- 页面具体内容 --- */
+        .subtitle {
+            color: var(--theme-color);
+            font-family: var(--font-serif);
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: var(--font-serif);
+            font-size: 64px;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+
+        .desc {
+            font-family: var(--font-sans);
             color: #888;
-            margin-top: 100px;
+            margin-bottom: 60px;
         }
 
-        /* --- 手机端适配 --- */
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border: 1px solid #333;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #333; color: #fff; }
+
+        /* --- 手机适配 --- */
         @media (max-width: 768px) {
-            nav { padding: 20px; }
-            .menu-links { display: none; /* 手机上隐藏菜单保持简洁 */ }
-            .hero-title { font-size: 14vw; }
-            .portfolio-grid { grid-template-columns: 1fr; gap: 60px; } /* 手机单列 */
+            body { flex-direction: column; }
+            .left-panel, .right-panel { width: 100%; position: relative; }
+            .right-panel { height: 300px; order: -1; /* 手机上图在最上面 */ }
+            .left-panel { padding: 30px; }
+            h1 { font-size: 40px; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="#" class="logo">LYNETTE ZHANG</a>
-        <div class="menu-links">
-            <a href="#">Work</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <span class="hero-subtitle">Digital Artist & Designer</span>
-        <h1 class="hero-title">VISUAL<br>NARRATIVES</h1>
-        <div class="scroll-down">↓ SCROLL TO EXPLORE</div>
-    </header>
-
-    <main class="portfolio-grid">
-
-        <div class="project-item">
-            <div class="img-wrap">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1200&auto=format&fit=crop" alt="Portrait">
+    <div class="left-panel">
+        <nav>
+            <div class="logo-box">🎨 LYNETTE</div>
+            <div class="menu">
+                <a href="index.html" class="active">Home</a>
+                <a href="about.html">About</a>
+                <a href="portfolios.html">Portfolios</a>
+                <a href="contact.html">Contact</a>
             </div>
-            <div class="meta">
-                <span class="project-title">Ethereal Gaze</span>
-                <span class="project-cat">Photography</span>
-            </div>
-        </div>
+        </nav>
 
-        <div class="project-item">
-            <div class="img-wrap">
-                <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1200&auto=format&fit=crop" alt="Abstract">
-            </div>
-            <div class="meta">
-                <span class="project-title">Liquid Chrome</span>
-                <span class="project-cat">3D Render</span>
-            </div>
-        </div>
+        <main>
+            <p class="subtitle">Oil Painter & Designer</p>
+            <h1>Welcome To My<br>Website</h1>
+            <p class="desc">Currently living and working in Hangzhou / Canada</p>
+            
+            <div style="font-family: cursive; font-size: 30px; color:#555; margin-bottom: 40px;">Lynette Zhang</div>
 
-        <div class="project-item">
-            <div class="img-wrap">
-                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop" alt="Landscape">
-            </div>
-            <div class="meta">
-                <span class="project-title">Silent Hills</span>
-                <span class="project-cat">Environment</span>
-            </div>
-        </div>
+            <a href="portfolios.html" class="btn">View All My Artworks →</a>
+        </main>
+    </div>
 
-        <div class="project-item">
-            <div class="img-wrap">
-                <img src="https://images.unsplash.com/photo-1614850523060-8da1d56ae167?q=80&w=1200&auto=format&fit=crop" alt="Neon">
-            </div>
-            <div class="meta">
-                <span class="project-title">Neon Dreams</span>
-                <span class="project-cat">Concept Art</span>
-            </div>
-        </div>
-
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Lynette Zhang. All rights reserved.</p>
-    </footer>
+    <div class="right-panel">
+        <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c42?q=80&w=1000" alt="Art Background">
+    </div>
 
 </body>
 </html>
