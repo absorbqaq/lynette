@@ -4,143 +4,285 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | LYNETTE ZHANG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- 全局样式库 (4个页面通用) --- */
+        /* --- 全局设置 --- */
         :root {
-            --font-serif: "Times New Roman", Times, Georgia, serif; /* 标题字体 */
-            --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif; /* 正文字体 */
-            --theme-color: #bfa480; /* 金棕色点缀 */
+            --font-serif: 'Playfair Display', serif; /* 标题字体 */
+            --font-sans: 'Lato', sans-serif;         /* 正文字体 */
+            --gold: #bfa480;                         /* 金色点缀 */
+            --gray: #666;
+            --light-gray: #f9f9f9;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            display: flex; /* 左右分屏核心 */
-            min-height: 100vh;
-        }
-
-        /* --- 左侧内容区 (60%宽度) --- */
-        .left-panel {
-            width: 60%;
-            background: #fcfcfc; /* 极淡的灰白色 */
-            padding: 60px 80px;
+            font-family: var(--font-sans);
+            color: #333;
+            line-height: 1.6;
             display: flex;
-            flex-direction: column;
         }
 
-        /* --- 右侧图片区 (40%宽度，固定不动) --- */
+        /* --- 左侧长滚动区域 (55%) --- */
+        .left-panel {
+            width: 55%;
+            background: #fff;
+            position: relative;
+            z-index: 2;
+            padding-bottom: 100px; /* 底部留白 */
+        }
+
+        /* 内部容器：限制内容宽度，不要太宽 */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* --- 右侧固定图片 (45%) --- */
         .right-panel {
-            width: 40%;
+            width: 45%;
             height: 100vh;
             position: fixed;
             right: 0;
             top: 0;
-            background-color: #333;
+            z-index: 1;
         }
-        
         .right-panel img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 铺满不拉伸 */
+            object-fit: cover;
         }
-
-        /* --- 导航栏 --- */
-        nav {
-            display: flex;
-            align-items: center;
-            margin-bottom: 120px; /* 导航离内容的距离 */
+        /* 右上角悬浮社交标 */
+        .social-overlay {
+            position: absolute;
+            top: 40px; right: 40px;
+            display: flex; gap: 20px;
         }
+        .social-icon { color: #fff; font-weight: bold; text-decoration: none; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 
-        .logo-box {
+        /* --- 通用组件样式 --- */
+        h2 {
             font-family: var(--font-serif);
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #111;
+        }
+        .section-label {
+            color: var(--gold);
+            font-family: var(--font-serif);
+            font-style: italic;
             font-weight: bold;
-            font-size: 20px;
-            margin-right: 60px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .menu {
-            display: flex;
-            gap: 30px;
-            font-family: var(--font-sans);
-            font-size: 14px;
-            color: #666;
-        }
-
-        .menu a { text-decoration: none; color: inherit; transition: 0.3s; }
-        .menu a:hover, .menu a.active { color: #000; font-weight: bold; }
-
-        /* --- 页面具体内容 --- */
-        .subtitle {
-            color: var(--theme-color);
-            font-family: var(--font-serif);
+            margin-bottom: 15px;
+            display: block;
             font-size: 18px;
-            margin-bottom: 20px;
         }
+        .btn-arrow {
+            text-decoration: none;
+            color: #000;
+            border: 1px solid #000;
+            padding: 12px 30px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .btn-arrow:hover { background: #000; color: #fff; }
 
-        h1 {
+        /* --- SECTION 1: 顶部 Welcome --- */
+        header { padding-top: 60px; margin-bottom: 150px; }
+        
+        nav { display: flex; align-items: center; margin-bottom: 80px; }
+        .logo { font-size: 24px; font-weight: bold; margin-right: auto; }
+        .menu { display: flex; gap: 25px; font-size: 13px; color: #888; font-weight: 500; }
+        .menu a { text-decoration: none; color: inherit; }
+        .menu a:hover, .menu a.active { color: #000; }
+
+        .hero-title {
             font-family: var(--font-serif);
             font-size: 64px;
             line-height: 1.1;
             margin-bottom: 30px;
-            color: #1a1a1a;
+            color: #111;
         }
+        .hero-desc { color: #666; margin-bottom: 40px; }
+        .signature { font-family: cursive; font-size: 30px; color: #555; margin-bottom: 40px; }
 
-        .desc {
-            font-family: var(--font-sans);
-            color: #888;
-            margin-bottom: 60px;
+        /* --- SECTION 2: The Story (履历) --- */
+        .section-story { margin-bottom: 150px; }
+        .resume-item {
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 2px solid #eee;
         }
+        .year { font-weight: bold; color: #000; display: block; margin-bottom: 5px; }
+        .event { color: #666; font-size: 14px; }
 
-        .btn {
-            display: inline-block;
-            padding: 15px 40px;
-            border: 1px solid #333;
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
+        /* --- SECTION 3: Artworks (作品预览) --- */
+        .section-artworks { margin-bottom: 150px; }
+        .art-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3张小图并排 */
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .art-grid img {
+            width: 100%;
+            aspect-ratio: 1/1; /* 正方形 */
+            object-fit: cover;
             transition: 0.3s;
         }
-        .btn:hover { background: #333; color: #fff; }
+        .art-grid img:hover { opacity: 0.8; }
 
-        /* --- 手机适配 --- */
+        /* --- SECTION 4: Quote (格言) --- */
+        .section-quote {
+            background: #f4f4f4;
+            padding: 80px 40px;
+            text-align: center;
+            margin-bottom: 150px;
+            /* 让灰色背景撑满左侧 */
+            margin-left: -40px; margin-right: -40px; 
+        }
+        .quote-text {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .quote-author { font-style: italic; color: #888; font-size: 14px; }
+
+        /* --- SECTION 5: Exhibition (展览) --- */
+        .section-news { margin-bottom: 150px; }
+        .news-card img { width: 100%; height: auto; margin-bottom: 20px; display: block; }
+        .news-meta { font-size: 12px; color: #999; margin-bottom: 10px; display: block; }
+        .news-desc { font-size: 14px; color: #555; line-height: 1.8; margin-bottom: 20px; }
+
+        /* --- SECTION 6: Footer (底部) --- */
+        footer {
+            border-top: 1px solid #eee;
+            padding-top: 50px;
+        }
+        .subscribe-box { margin-bottom: 40px; }
+        .subscribe-label { font-weight: bold; margin-bottom: 10px; display: block; }
+        .email-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            background: #fcfcfc;
+            margin-bottom: 10px;
+        }
+        .copyright { font-size: 12px; color: #999; }
+
+        /* --- 手机端适配 --- */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .left-panel, .right-panel { width: 100%; position: relative; }
-            .right-panel { height: 300px; order: -1; /* 手机上图在最上面 */ }
-            .left-panel { padding: 30px; }
-            h1 { font-size: 40px; }
+            .left-panel, .right-panel { width: 100%; }
+            .right-panel { height: 350px; position: relative; order: -1; }
+            .container { padding: 0 25px; }
+            .hero-title { font-size: 42px; }
+            .art-grid { grid-template-columns: 1fr; } /* 手机上作品变单列 */
         }
     </style>
 </head>
 <body>
 
     <div class="left-panel">
-        <nav>
-            <div class="logo-box">🎨 LYNETTE</div>
-            <div class="menu">
-                <a href="index.html" class="active">Home</a>
-                <a href="about.html">About</a>
-                <a href="portfolios.html">Portfolios</a>
-                <a href="contact.html">Contact</a>
-            </div>
-        </nav>
-
-        <main>
-            <p class="subtitle">Oil Painter & Designer</p>
-            <h1>Welcome To My<br>Website</h1>
-            <p class="desc">Currently living and working in Hangzhou / Canada</p>
+        <div class="container">
             
-            <div style="font-family: cursive; font-size: 30px; color:#555; margin-bottom: 40px;">Lynette Zhang</div>
+            <header>
+                <nav>
+                    <div class="logo">🎨</div>
+                    <div class="menu">
+                        <a href="index.html" class="active">Home</a>
+                        <a href="about.html">About</a>
+                        <a href="portfolios.html">Portfolios</a>
+                        <a href="contact.html">Contact</a>
+                    </div>
+                </nav>
 
-            <a href="portfolios.html" class="btn">View All My Artworks →</a>
-        </main>
-    </div>
+                <span class="section-label">oil painter</span>
+                <h1 class="hero-title">Welcome To My<br>Website</h1>
+                <p class="hero-desc">Currently living and working in Hangzhou / Canada</p>
+                <div class="signature">Lynette Zhang</div>
+                <a href="portfolios.html" class="btn-arrow">View All My Artworks &rarr;</a>
+            </header>
 
-    <div class="right-panel">
-        <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c42?q=80&w=1000" alt="Art Background">
+            <section class="section-story">
+                <span class="section-label">The story of</span>
+                <h2>Lynette Zhang</h2>
+                <p style="color:#666; margin-bottom:30px; font-size:14px;">(b.2002) Digital Artist & Oil Painter.</p>
+                
+                <div class="resume-item">
+                    <span class="year">2024 - Present</span>
+                    <span class="event">Master of Fine Arts (MFA), Art Academy.</span>
+                </div>
+                <div class="resume-item">
+                    <span class="year">2020 - 2024</span>
+                    <span class="event">Bachelor of Oil Painting, Studio of Neoclassicism.</span>
+                </div>
+                
+                <a href="about.html" style="color:#000; font-weight:bold; font-size:13px; text-decoration:none;">Read More &rarr;</a>
+            </section>
+
+            <section class="section-artworks">
+                <span class="section-label">Artworks</span>
+                <div class="art-grid">
+                    <img src="https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?q=80&w=400" alt="Art 1">
+                    <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=400" alt="Art 2">
+                    <img src="https://images.unsplash.com/photo-1576769399222-19e07297e558?q=80&w=400" alt="Art 3">
+                </div>
+                <a href="portfolios.html" class="btn-arrow">View All Artworks &rarr;</a>
+            </section>
+
+            <section class="section-quote">
+                <div class="quote-text">
+                    “ AN ARTIST SHOULD NOT LIE TO HIMSELF OR OTHERS. AN ARTIST SHOULD NOT STEAL IDEAS FROM OTHER ARTISTS. ”
+                </div>
+                <div class="quote-author">— Marina Abramovic</div>
+            </section>
+
+            <section class="section-news">
+                <span class="section-label" style="color:#000; margin-bottom:5px;">Don't miss it!</span>
+                <h2>Recent Exhibition News</h2>
+                
+                <div class="news-card">
+                    <img src="https://images.unsplash.com/photo-1518998053901-5348d3969105?q=80&w=800" alt="Exhibition">
+                    
+                    <span class="news-meta">2025.4 - 6 月 | Location: BANJURITA - Hangzhou</span>
+                    <p class="news-desc">
+                        不同的灯光代表着我们不同的期许。当我们望着回家的路灯，抬头看到一闪而过的流星。
+                        太阳褪去，黑夜的光总是那么耀眼，让每个平凡的日子在记忆里都如此闪烁。
+                    </p>
+                    <a href="#" style="text-decoration:underline; color:#000;">Check Details</a>
+                </div>
+            </section>
+
+            <footer>
+                <div class="subscribe-box">
+                    <span class="subscribe-label">Get all the latest news</span>
+                    <input type="email" placeholder="Your email address" class="email-input">
+                    <a href="#" class="btn-arrow" style="border:none; background:#000; color:#fff;">Subscribe</a>
+                </div>
+                
+                <div class="menu" style="margin-bottom:20px;">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="portfolios.html">Portfolios</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                
+                <div class="copyright">Copyright © 2025 Lynette Zhang Portfolio</div>
+            </footer>
+
+        </div> </div> <div class="right-panel">
+        <div class="social-overlay">
+            <a href="#" class="social-icon">小红书</a>
+            <a href="#" class="social-icon">INS</a>
+        </div>
+        <img src="https://images.unsplash.com/photo-1579783902614-a3fb39279c42?q=80&w=1200" alt="Cover Art">
     </div>
 
 </body>

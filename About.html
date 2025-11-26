@@ -4,37 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About | LYNETTE ZHANG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        :root { --font-serif: "Times New Roman", Times, serif; --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+        /* 复用核心样式 */
+        :root { --font-serif: 'Playfair Display', serif; --gold-color: #bfa480; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { display: flex; min-height: 100vh; }
-        .left-panel { width: 60%; background: #fcfcfc; padding: 60px 80px; display: flex; flex-direction: column; }
-        .right-panel { width: 40%; height: 100vh; position: fixed; right: 0; top: 0; background: #333; }
-        .right-panel img { width: 100%; height: 100%; object-fit: cover; }
-        nav { display: flex; align-items: center; margin-bottom: 80px; }
-        .logo-box { font-family: var(--font-serif); font-weight: bold; font-size: 20px; margin-right: 60px; }
-        .menu { display: flex; gap: 30px; font-family: var(--font-sans); font-size: 14px; color: #666; }
-        .menu a { text-decoration: none; color: inherit; }
-        .menu a:hover, .menu a.active { color: #000; font-weight: bold; }
+        body { display: flex; min-height: 100vh; font-family: "Helvetica Neue", sans-serif; }
         
+        .left-panel { width: 55%; background: #fff; padding: 5% 6%; display: flex; flex-direction: column; min-height: 100vh; z-index: 2; }
+        .right-panel { width: 45%; height: 100vh; position: fixed; right: 0; top: 0; background: #f0f0f0; z-index: 1; }
+        .right-panel img { width: 100%; height: 100%; object-fit: cover; }
+        .social-overlay { position: absolute; top: 40px; right: 40px; display: flex; gap: 20px; z-index: 10; }
+        .social-icon { color: #fff; font-size: 14px; font-weight: bold; text-decoration: none; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+        nav { display: flex; align-items: center; margin-bottom: 80px; }
+        .logo-box { font-size: 24px; font-weight: bold; margin-right: auto; }
+        .menu { display: flex; gap: 30px; font-size: 13px; color: #888; font-weight: 500; }
+        .menu a { text-decoration: none; color: inherit; transition: 0.3s; }
+        .menu a:hover, .menu a.active { color: #000; }
+
         /* About 独有样式 */
-        h1 { font-family: var(--font-serif); font-size: 56px; margin-bottom: 40px; color: #1a1a1a; }
-        .intro-text { font-family: var(--font-sans); font-size: 16px; line-height: 1.8; color: #555; max-width: 600px; margin-bottom: 20px; }
-        .quote { margin-top: 60px; font-family: var(--font-serif); font-size: 24px; font-style: italic; color: #888; border-left: 3px solid #000; padding-left: 20px; }
+        h1 { font-family: var(--font-serif); font-size: 56px; margin-bottom: 40px; color: #111; }
+        
+        .intro-block { margin-bottom: 60px; }
+        .intro-block p { color: #666; line-height: 1.8; margin-bottom: 20px; font-size: 15px; }
+        
+        /* 蓝色格言区 */
+        .quote-section {
+            background-image: url('https://images.unsplash.com/photo-1505691938895-1758d7bab58d?q=80&w=1000'); /* 蓝色水纹图 */
+            background-size: cover;
+            background-position: center;
+            padding: 60px 40px;
+            color: #fff;
+            margin: 0 -6% 0 -6%; /* 撑满左侧面板宽度 */
+            text-align: center;
+            position: relative;
+        }
+        .quote-section::before {
+            content: ""; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0, 30, 80, 0.4); /* 蓝色遮罩 */
+        }
+        .quote-text {
+            position: relative; z-index: 1;
+            font-family: var(--font-serif);
+            font-size: 20px;
+            line-height: 1.6;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .quote-icon { font-size: 40px; display: block; margin-bottom: 10px; opacity: 0.8; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
             .left-panel, .right-panel { width: 100%; position: relative; }
             .right-panel { height: 300px; order: -1; }
-            .left-panel { padding: 30px; }
         }
     </style>
 </head>
 <body>
-
     <div class="left-panel">
         <nav>
-            <div class="logo-box">🎨 LYNETTE</div>
+            <div class="logo-box">🎨</div>
             <div class="menu">
                 <a href="index.html">Home</a>
                 <a href="about.html" class="active">About</a>
@@ -45,23 +75,26 @@
 
         <main>
             <h1>About me</h1>
-            <p class="intro-text">
-                人类与AI的差别在于我们有意识和情感，做不到完全理性。
-                艺术正是感性的产物，我常被生活里的每个瞬间触动，在我画作前，画下人们细腻的情感起伏。
-            </p>
-            <p class="intro-text">
-                My artistic creation is based on classicism, integrating surrealism and capturing the subtle vibrations of human emotions.
-            </p>
+            <div class="intro-block">
+                <p>人类与AI的差别在于我们有意识和情感，做不到完全理性。艺术正是感性的产物，我常被生活里的每个瞬间触动，在我画作前，画下人们细腻的情感起伏。</p>
+                <p>My artistic creation is based on classicism, integrating surrealism and capturing the subtle vibrations of human emotions.</p>
+            </div>
 
-            <div class="quote">
-                "An artist should stay for long periods of time at waterfalls..."
+            <div class="quote-section">
+                <span class="quote-icon">“</span>
+                <div class="quote-text">
+                    AN ARTIST SHOULD STAY FOR LONG PERIODS OF TIME AT WATERFALLS, AT EXPLODING VOLCANOES, LOOKING AT FAST-RUNNING RIVERS.
+                </div>
             </div>
         </main>
     </div>
 
     <div class="right-panel">
-        <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1000" alt="About Background">
+        <div class="social-overlay">
+            <a href="#" class="social-icon">小红书</a>
+            <a href="#" class="social-icon">INS</a>
+        </div>
+        <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1200" alt="About Art">
     </div>
-
 </body>
 </html>
