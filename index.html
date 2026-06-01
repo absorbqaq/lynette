@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,29 +14,24 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
             width: 100%;
+            height: 100%;
             min-height: 100vh;
         }
 
         body {
             background-color: #000;
-            overflow-x: hidden;
+            background-image: url("texture/mainbgchun.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow: hidden;
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        .page-nav {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 10px;
-            width: min(420px, calc(100vw - 32px));
-        }
-
+        .index-button,
         .page-nav a {
             color: #fff;
             text-decoration: none;
@@ -48,18 +46,106 @@
             white-space: nowrap;
         }
 
+        .index-button:hover,
         .page-nav a:hover {
             background: rgba(255, 255, 255, 0.16);
             border-color: rgba(255, 255, 255, 0.95);
         }
 
-        .main-image {
-            display: block;
+        .index-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            font-size: 12px;
+            padding: 9px 12px;
+        }
+
+        .page-nav {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 10px;
+            width: min(420px, calc(100vw - 32px));
+        }
+
+        .left-photo {
+            position: fixed;
+            inset: 0 auto 0 0;
+            width: min(44vw, 760px);
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 1) 0%,
+                rgba(0, 0, 0, 1) 62%,
+                rgba(0, 0, 0, 0.82) 74%,
+                rgba(0, 0, 0, 0.38) 88%,
+                rgba(0, 0, 0, 0) 100%
+            );
+            mask-image: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 1) 0%,
+                rgba(0, 0, 0, 1) 62%,
+                rgba(0, 0, 0, 0.82) 74%,
+                rgba(0, 0, 0, 0.38) 88%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .left-photo::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -8%;
+            width: 34%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 248, 240, 0.34) 0%,
+                rgba(255, 248, 240, 0.22) 26%,
+                rgba(255, 248, 240, 0.08) 56%,
+                rgba(255, 248, 240, 0) 100%
+            );
+            filter: blur(26px);
+            transform: scaleX(1.12);
+            opacity: 0.9;
+        }
+
+        .left-photo img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
+            object-position: left center;
+            display: block;
+            filter: saturate(0.98) contrast(1.02);
+        }
+
+        .text-layer {
+            position: fixed;
+            left: 48px;
+            bottom: 48px;
+            z-index: 9;
+            color: #fff;
+            font-family: "Pacifico", cursive;
+            font-size: clamp(38px, 6vw, 92px);
+            line-height: 1.05;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
         }
 
         @media (max-width: 640px) {
+            .index-button {
+                top: 14px;
+                left: 14px;
+            }
+
             .page-nav {
                 top: 14px;
                 right: 14px;
@@ -71,16 +157,30 @@
                 font-size: 12px;
                 padding: 9px 12px;
             }
+
+            .left-photo {
+                width: 64vw;
+            }
+
+            .text-layer {
+                left: 20px;
+                right: 20px;
+                bottom: 24px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="left-photo" aria-hidden="true">
+        <img src="texture/mainbg.jpg" alt="">
+    </div>
+    <a class="index-button" href="index.html">Index</a>
     <nav class="page-nav" aria-label="Primary navigation">
         <a href="aboutme.html">About Me</a>
         <a href="artworks.html">Artworks</a>
         <a href="photographs.html">Photographs</a>
         <a href="contact.html">Contact</a>
     </nav>
-    <img class="main-image" src="texture/mainbg.jpg" alt="">
+    <div class="text-layer">Lynette Zhang</div>
 </body>
 </html>
