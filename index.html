@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <script>
+        (() => {
+            const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "contact"];
+            const raw = window.location.hash.replace("#", "").trim().toLowerCase();
+            const page = pageNames.includes(raw) ? raw : "index";
+            document.documentElement.dataset.page = page;
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playball&display=swap" rel="stylesheet">
     <style>
+        /* 基础重置：清掉浏览器默认边距，避免排版被影响 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* 让页面始终铺满整个屏幕 */
         html,
         body {
             width: 100%;
@@ -21,6 +31,8 @@
             min-height: 100vh;
         }
 
+        /* 整站总背景
+           想换整页背景图，就改 background-image 这里 */
         body {
             background-color: #000;
             background-image: url("texture/mainbgchun.jpg");
@@ -31,65 +43,323 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        html[data-page="aboutme"] body {
+            background-image: url("texture/aboutme_bg.jpg");
+        }
+
+        html[data-page="artworks"] body,
+        html[data-page="artworks-1"] body,
+        html[data-page="artworks-2"] body {
+            background-image: url("texture/artworks_bg.jpg");
+        }
+
+        html[data-page="artworks-3"] body {
+            background-image: url("texture/artwork3_bg.jpg");
+        }
+
+        html[data-page="artworks-4"] body {
+            background-image: url("texture/artwork4_bg.jpg");
+        }
+
+        html[data-page="photographs"] body {
+            background-image: url("texture/photograph_bg.jpg");
+        }
+
+        html[data-page="contact"] body {
+            background-image: url("texture/contact_bg.jpg");
+        }
+
+        /* 在脚本决定当前页面之前，先别把内容露出来，避免首页闪一下 */
+        body:not(.page-ready) .page-content {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        html[data-page]:not([data-page="index"]) .left-photo {
+            opacity: 0;
+        }
+
+        /* 隐藏系统鼠标，改用下面的自定义鼠标 */
         html,
         body,
         body * {
-            cursor: url("texture/mouse_stand.png") 6 6, auto;
+            cursor: none !important;
         }
 
-        a,
-        button,
-        [role="button"],
-        input[type="button"],
-        input[type="submit"] {
-            cursor: url("texture/mouse_hover.png") 6 6, pointer;
+        /* 自定义鼠标
+           width / height 控制鼠标图片大小
+           transform 里的数值控制鼠标热点位置 */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 36px;
+            height: 36px;
+            z-index: 9999;
+            pointer-events: none;
+            background-image: url("texture/mouse_stand_cursor.png");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            transform: translate(-6px, -6px);
+            opacity: 0;
         }
 
-        .index-button,
+        /* 鼠标开始移动后才显示 */
+        .custom-cursor.is-ready {
+            opacity: 1;
+        }
+
+        /* 鼠标悬浮到可点击区域时切换 hover 图 */
+        .custom-cursor.is-hover,
+        .custom-cursor.is-active {
+            background-image: url("texture/mouse_hover_cursor.png");
+        }
+
+        /* 按钮链接的基础样式 */
         .page-nav a {
             color: #fff;
             text-decoration: none;
-            font-size: 13px;
-            line-height: 1;
-            padding: 10px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(8px);
-            transition: background-color 0.2s ease, border-color 0.2s ease;
             white-space: nowrap;
         }
 
-        .index-button:hover,
-        .page-nav a:hover {
-            background: rgba(255, 255, 255, 0.16);
-            border-color: rgba(255, 255, 255, 0.95);
-        }
-
-        .index-button {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-            font-size: 12px;
-            padding: 9px 12px;
-        }
-
+        /* 右上角 5 个按钮的总容器
+           top：整组上下位置
+           right：整组左右位置（数值越大，越往左）
+           gap：按钮之间间距
+           width：整组按钮占多宽 */
         .page-nav {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 50px;
+            right: 205px;
             z-index: 10;
             display: flex;
             flex-wrap: wrap;
             justify-content: flex-end;
-            gap: 10px;
-            width: min(420px, calc(100vw - 32px));
+            align-items: flex-end;
+            gap: 4px;
+            width: min(520px, calc(100vw - 32px));
+            transition: transform 0.25s ease;
         }
 
+        /* 按钮背后的云层
+           top：云层上下位置
+           right：云层左右位置（数值越大，越往左）
+           width：云层大小 */
+        .nav-cloud {
+            position: fixed;
+            top: 31px;
+            right: 15px;
+            z-index: 8;
+            width: min(760px, calc(100vw + 24px));
+            pointer-events: none;
+            opacity: 0.9;
+            transition: transform 0.25s ease;
+        }
+
+        /* 非首页时：按钮单独往右上移动 */
+        body.subpage-active .page-nav {
+            transform: translate(150px, -30px);
+        }
+
+        /* 非首页时：隐藏云层，只有首页保留 */
+        body.subpage-active .nav-cloud {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* 云层图片本体 */
+        .nav-cloud img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* 顶部一级按钮盒子
+           width / height：按钮大小 */
+        .page-nav > a,
+        .art-nav-group {
+            position: relative;
+            width: 77px;
+            height: 77px;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        /* Art 主按钮分组需要让分支可以溢出显示 */
+        .art-nav-group {
+            overflow: visible;
+        }
+
+        /* Art 主按钮本体 */
+        .art-nav-main {
+            position: relative;
+            width: 77px;
+            height: 77px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        /* 顶部一级按钮图片本体
+           object-fit: contain 表示完整显示图片，不裁切 */
+        .page-nav > a img,
+        .art-nav-main img {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center bottom;
+            display: block;
+            pointer-events: none;
+        }
+
+        /* 当前页面按钮状态预留 */
+        .page-nav > a.is-active,
+        .art-nav-main.is-active {
+            opacity: 1;
+        }
+
+        /* 按钮 hover / 点击反馈
+           brightness：变暗多少
+           scale：放大多少 */
+        .page-nav > a:hover,
+        .page-nav > a:active,
+        .art-nav-group:hover .art-nav-main,
+        .art-nav-main:active {
+            filter: brightness(0.88);
+            transform: scale(1.04);
+        }
+
+        /* 第 2 / 4 / 5 个按钮整体往下调
+           数值越大越往下 */
+        .nav-about {
+            transform: translateY(12px);
+        }
+
+        /* 第 4 / 5 个按钮再单独微调 */
+        .nav-photo,
+        .nav-contact {
+            transform: translate(0, 7px) scale(1);
+        }
+
+        /* About 按钮悬浮时的反馈 */
+        .nav-about:hover,
+        .nav-about:active {
+            transform: translateY(12px) scale(1.04);
+        }
+
+        /* Photo / Contact 按钮悬浮时的反馈 */
+        .nav-photo:hover,
+        .nav-photo:active,
+        .nav-contact:hover,
+        .nav-contact:active {
+            transform: translate(0, 7px) scale(1.04);
+        }
+
+        /* Art 的四个分支菜单
+           top：控制分支出现在主按钮下方多远
+           gap：控制分支图片之间间距 */
+        .art-branches {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 50%;
+            z-index: 12;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) scale(0.96);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        /* 这个透明连接带专门用来防止鼠标从 Art 主按钮滑向分支时断开 hover */
+        .art-branches::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -14px;
+            height: 18px;
+        }
+
+        /* 鼠标移到 Art 主按钮区域时，展开 4 个分支 */
+        .art-nav-group:hover .art-branches {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 点进 art 页面后，先强制把分支锁住收回；
+           只有鼠标离开再重新移回 Art，才会再次展开 */
+        .art-nav-group.branches-locked .art-branches {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) scale(0.96);
+        }
+
+        /* 只要已经进入任何 art 页面，就不要再自动展开分支菜单 */
+        body.art-page-active .art-branches {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) scale(0.96);
+        }
+
+        /* 分支图片按钮
+           width / height：分支图片大小 */
+        .branch-link {
+            position: relative;
+            display: block;
+            width: 116px;
+            height: 116px;
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        .branch-link img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        /* 分支 hover 效果 */
+        .branch-link:hover,
+        .branch-link:active,
+        .branch-link.is-active {
+            filter: brightness(0.88);
+            transform: scale(1.04);
+        }
+
+        /* 去掉点击后浏览器残留的焦点外观 */
+        .page-nav a:focus,
+        .page-nav a:focus-visible,
+        .art-nav-main:focus,
+        .art-nav-main:focus-visible,
+        .branch-link:focus,
+        .branch-link:focus-visible {
+            outline: none;
+            filter: none;
+            box-shadow: none;
+        }
+
+        /* 左边的大图
+           left：图片往右移多少
+           width：图片区域宽度 */
         .left-photo {
             position: fixed;
-            inset: 0 auto 0 0;
+            top: 0;
+            left: 36px;
             width: min(44vw, 760px);
             height: 100vh;
             z-index: 1;
@@ -97,29 +367,57 @@
             overflow: hidden;
             -webkit-mask-image: linear-gradient(
                 to right,
-                rgba(0, 0, 0, 1) 0%,
-                rgba(0, 0, 0, 1) 62%,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.45) 8%,
+                rgba(0, 0, 0, 0.9) 16%,
+                rgba(0, 0, 0, 1) 26%,
+                rgba(0, 0, 0, 1) 60%,
                 rgba(0, 0, 0, 0.82) 74%,
                 rgba(0, 0, 0, 0.38) 88%,
                 rgba(0, 0, 0, 0) 100%
             );
             mask-image: linear-gradient(
                 to right,
-                rgba(0, 0, 0, 1) 0%,
-                rgba(0, 0, 0, 1) 62%,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.45) 8%,
+                rgba(0, 0, 0, 0.9) 16%,
+                rgba(0, 0, 0, 1) 26%,
+                rgba(0, 0, 0, 1) 60%,
                 rgba(0, 0, 0, 0.82) 74%,
                 rgba(0, 0, 0, 0.38) 88%,
                 rgba(0, 0, 0, 0) 100%
             );
         }
 
+        /* 左右两边的柔光层，让边缘融进背景 */
+        .left-photo::before,
         .left-photo::after {
             content: "";
             position: absolute;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .left-photo::before {
+            top: 0;
+            left: -8%;
+            width: 28%;
+            background: linear-gradient(
+                to left,
+                rgba(255, 248, 240, 0.24) 0%,
+                rgba(255, 248, 240, 0.14) 26%,
+                rgba(255, 248, 240, 0.06) 56%,
+                rgba(255, 248, 240, 0) 100%
+            );
+            filter: blur(24px);
+            transform: scaleX(1.08);
+            opacity: 0.88;
+        }
+
+        .left-photo::after {
             top: 0;
             right: -8%;
             width: 34%;
-            height: 100%;
             background: linear-gradient(
                 to right,
                 rgba(255, 248, 240, 0.34) 0%,
@@ -132,6 +430,8 @@
             opacity: 0.9;
         }
 
+        /* 左边大图本体
+           object-position 可以调整图片在框里的偏向 */
         .left-photo img {
             width: 100%;
             height: 100%;
@@ -141,60 +441,613 @@
             filter: saturate(0.98) contrast(1.02);
         }
 
+        /* 签名区域
+           right：签名左右位置（数值越大，越往左）
+           bottom：签名上下位置（数值越大，越往上） */
         .text-layer {
             position: fixed;
-            left: 48px;
-            bottom: 48px;
+            right: calc(16vw - 70px);
+            bottom: calc(28vh - 40px);
             z-index: 9;
-            color: #fff;
-            font-family: "Pacifico", cursive;
-            font-size: clamp(38px, 6vw, 92px);
-            line-height: 1.05;
-            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        /* 签名图片本体
+           width：签名大小，之后想放大/缩小主要改这里 */
+        .text-layer img {
+            display: block;
+            width: min(56.1vw, 600px);
+            height: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 主页签名的不规则小光点
+           left / top：控制这一小片闪光区域的位置
+           width / height：控制闪光区域大小，越小范围越集中
+           background 里的百分比：控制每颗光点在小区域里的位置
+           animation 时间越短，闪得越快
+           steps() 会让光点跳着闪，不会有整齐呼吸感 */
+        .text-layer::before,
+        .text-layer::after {
+            content: "";
+            position: absolute;
+            left: 58%;
+            top: 0%;
+            width: 24%;
+            height: 72%;
+            z-index: 2;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+        }
+
+        .text-layer::before {
+            background:
+                radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1.6px, transparent 3.4px) 8% 18% / 24px 24px no-repeat,
+                radial-gradient(circle, rgba(255, 205, 244, 0.88) 0 1.8px, transparent 3.8px) 18% 46% / 26px 26px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.4px, transparent 3.2px) 28% 26% / 22px 22px no-repeat,
+                radial-gradient(circle, rgba(208, 194, 255, 0.88) 0 1.7px, transparent 3.7px) 36% 64% / 25px 25px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.92) 0 1.5px, transparent 3.4px) 48% 38% / 24px 24px no-repeat,
+                radial-gradient(circle, rgba(255, 185, 235, 0.86) 0 1.7px, transparent 3.8px) 60% 72% / 26px 26px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.4px, transparent 3.2px) 72% 30% / 22px 22px no-repeat,
+                radial-gradient(circle, rgba(208, 194, 255, 0.84) 0 1.8px, transparent 3.9px) 86% 58% / 27px 27px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.88) 0 1.1px, transparent 2.8px) 14% 72% / 18px 18px no-repeat,
+                radial-gradient(circle, rgba(255, 210, 246, 0.78) 0 1.2px, transparent 3px) 40% 18% / 19px 19px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 1.1px, transparent 2.8px) 54% 84% / 18px 18px no-repeat,
+                radial-gradient(circle, rgba(208, 194, 255, 0.76) 0 1.2px, transparent 3px) 92% 24% / 19px 19px no-repeat;
+            animation: signature-sparkle-a 0.58s steps(2, end) infinite;
+        }
+
+        .text-layer::after {
+            background:
+                radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 1.4px, transparent 3.3px) 13% 66% / 23px 23px no-repeat,
+                radial-gradient(circle, rgba(255, 215, 250, 0.86) 0 1.7px, transparent 3.6px) 24% 30% / 25px 25px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.3px, transparent 3px) 34% 80% / 21px 21px no-repeat,
+                radial-gradient(circle, rgba(208, 194, 255, 0.9) 0 1.7px, transparent 3.8px) 45% 18% / 25px 25px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.94) 0 1.5px, transparent 3.4px) 56% 56% / 23px 23px no-repeat,
+                radial-gradient(circle, rgba(255, 190, 238, 0.84) 0 1.6px, transparent 3.7px) 66% 24% / 25px 25px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.92) 0 1.4px, transparent 3.2px) 78% 74% / 22px 22px no-repeat,
+                radial-gradient(circle, rgba(208, 194, 255, 0.86) 0 1.8px, transparent 4px) 92% 36% / 27px 27px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 2.7px) 6% 38% / 17px 17px no-repeat,
+                radial-gradient(circle, rgba(255, 190, 238, 0.78) 0 1.2px, transparent 3px) 30% 58% / 19px 19px no-repeat,
+                radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 1.1px, transparent 2.8px) 70% 48% / 18px 18px no-repeat,
+                radial-gradient(circle, rgba(208, 194, 255, 0.78) 0 1.2px, transparent 3px) 84% 88% / 19px 19px no-repeat;
+            animation: signature-sparkle-b 0.43s steps(3, end) infinite;
+        }
+
+        @keyframes signature-sparkle-a {
+            0% {
+                opacity: 0.95;
+                transform: translate(0, 0) scale(1);
+            }
+
+            18% {
+                opacity: 0.12;
+                transform: translate(2px, -1px) scale(0.98);
+            }
+
+            41% {
+                opacity: 0.72;
+                transform: translate(-1px, 1px) scale(1.02);
+            }
+
+            63% {
+                opacity: 0.24;
+                transform: translate(1px, 2px) scale(0.99);
+            }
+
+            100% {
+                opacity: 0.86;
+                transform: translate(-2px, 0) scale(1.01);
+            }
+        }
+
+        @keyframes signature-sparkle-b {
+            0% {
+                opacity: 0.18;
+                transform: translate(1px, 1px) scale(0.99);
+            }
+
+            27% {
+                opacity: 0.88;
+                transform: translate(-1px, -2px) scale(1.02);
+            }
+
+            52% {
+                opacity: 0.08;
+                transform: translate(2px, 0) scale(0.97);
+            }
+
+            74% {
+                opacity: 0.98;
+                transform: translate(0, 2px) scale(1.01);
+            }
+
+            100% {
+                opacity: 0.34;
+                transform: translate(-2px, -1px) scale(1);
+            }
+        }
+
+        /* 单页切换的内容层
+           五个“页面”其实都挂在 index 里 */
+        .page-content {
+            position: fixed;
+            inset: 0;
+            z-index: 9;
             pointer-events: none;
         }
 
+        /* 默认隐藏每个页面面板 */
+        .page-panel {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: none;
+        }
+
+        /* 当前显示的页面面板 */
+        .page-panel.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* About Me 页面单独背景
+           只会在 aboutme 这个页面状态显示 */
+        .page-panel[data-page="aboutme"] {
+            background-image: url("texture/aboutme_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Art 主页和前 2 个分支统一背景
+           第 3 / 第 4 个分支有自己的背景 */
+        .page-panel[data-page="artworks"],
+        .page-panel[data-page="artworks-1"],
+        .page-panel[data-page="artworks-2"] {
+            background-image: url("texture/artworks_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Art 第 3 个分支单独背景 */
+        .page-panel[data-page="artworks-3"] {
+            background-image: url("texture/artwork3_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Art 第 4 个分支单独背景 */
+        .page-panel[data-page="artworks-4"] {
+            background-image: url("texture/artwork4_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Photographs 页面背景 */
+        .page-panel[data-page="photographs"] {
+            background-image: url("texture/photograph_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Contact 页面背景 */
+        .page-panel[data-page="contact"] {
+            background-image: url("texture/contact_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Contact 页面中间图片
+           left / top：控制图片中心位置，50% 就是页面正中间
+           width：控制图片大小 */
+        .contact-center-pic {
+            position: absolute;
+            left: 50%;
+            top: 55%;
+            z-index: 2;
+            width: min(100vw, 710px);
+            max-height: 100vh;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .contact-center-pic img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 100vh;
+            object-fit: contain;
+        }
+
+        /* 页面左上角标题
+           left：控制离左边多远，数值越大越往右
+           top：控制离上边多远，数值越大越往下
+           .art-title-main / .page-title-main 的 font-size：控制大字大小
+           .art-title-sub 的 font-size：控制分支小字大小
+           小字在 Artworks 下面，并且和左边对齐 */
+        .art-title,
+        .page-title {
+            position: absolute;
+            left: 54px;
+            top: 42px;
+            z-index: 3;
+            width: max-content;
+            font-family: "Pacifico", cursive;
+            color: #fff;
+            pointer-events: none;
+        }
+
+        .art-title-main,
+        .page-title-main {
+            font-size: 64px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .art-title-sub {
+            display: block;
+            margin-top: 6px;
+            font-size: 32px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* Art 主页和前两个分支标题颜色 */
+        .page-panel[data-page="artworks"] .art-title,
+        .page-panel[data-page="artworks-1"] .art-title,
+        .page-panel[data-page="artworks-2"] .art-title {
+            color: #ff87c5;
+        }
+
+        /* Art 第 3 个分支标题颜色 */
+        .page-panel[data-page="artworks-3"] .art-title {
+            color: #23bbc8;
+        }
+
+        /* Photographs 页面标题颜色 */
+        .page-panel[data-page="photographs"] .page-title {
+            color: #d0c2ff;
+        }
+
+        /* About Me 页面单独大图
+           right：控制是否贴右边
+           width：控制图片区域宽度
+           这里做的是“靠右 + 左边缘融化进背景” */
+        .aboutme-side-pic {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: min(42vw, 570px);
+            height: 100%;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.32) 10%,
+                rgba(0, 0, 0, 0.82) 20%,
+                rgba(0, 0, 0, 1) 30%,
+                rgba(0, 0, 0, 1) 100%
+            );
+            mask-image: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.32) 10%,
+                rgba(0, 0, 0, 0.82) 20%,
+                rgba(0, 0, 0, 1) 30%,
+                rgba(0, 0, 0, 1) 100%
+            );
+        }
+
+        .aboutme-side-pic::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -8%;
+            width: 24%;
+            height: 100%;
+            background: linear-gradient(
+                to left,
+                rgba(255, 248, 240, 0.24) 0%,
+                rgba(255, 248, 240, 0.12) 28%,
+                rgba(255, 248, 240, 0.04) 60%,
+                rgba(255, 248, 240, 0) 100%
+            );
+            filter: blur(22px);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .aboutme-side-pic img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* 手机端单独规则
+           小屏幕时，按钮 / 云层 / 左图 / 签名都在这里调 */
         @media (max-width: 640px) {
-            .index-button {
-                top: 14px;
-                left: 14px;
+            /* 手机端云层位置和大小 */
+            .nav-cloud {
+                top: 31px;
+                right: 7px;
+                width: min(348px, calc(100vw + 36px));
             }
 
+            /* 手机端按钮整组位置和宽度 */
             .page-nav {
-                top: 14px;
-                right: 14px;
-                gap: 8px;
-                width: calc(100vw - 24px);
+                top: 44px;
+                right: 199px;
+                gap: 4px;
+                width: min(176px, calc(100vw - 24px));
             }
 
-            .page-nav a {
-                font-size: 12px;
-                padding: 9px 12px;
+            /* 手机端顶部主按钮大小 */
+            .page-nav > a,
+            .art-nav-group,
+            .art-nav-main {
+                width: 77px;
+                height: 77px;
             }
 
+            .art-nav-group,
+            .art-nav-main {
+                width: 77px;
+                height: 77px;
+            }
+
+            .art-branches {
+                top: calc(100% + 4px);
+                gap: 6px;
+            }
+
+            .branch-link {
+                width: 98px;
+                height: 98px;
+            }
+
+            /* 手机端左上角标题位置和大小 */
+            .art-title,
+            .page-title {
+                left: 24px;
+                top: 34px;
+            }
+
+            .art-title-main,
+            .page-title-main {
+                font-size: 44px;
+            }
+
+            /* 手机端 Art 分支小标题位置和大小 */
+            .art-title-sub {
+                margin-top: 4px;
+                font-size: 22px;
+            }
+
+            /* 手机端左图位置和大小 */
             .left-photo {
+                left: 18px;
                 width: 64vw;
             }
 
+            /* 手机端签名位置 */
             .text-layer {
-                left: 20px;
-                right: 20px;
-                bottom: 24px;
+                right: calc(10vw - 120px);
+                left: auto;
+                bottom: calc(22vh - 120px);
+            }
+
+            .aboutme-side-pic {
+                width: 52vw;
+            }
+
+            /* 手机端 Contact 中间图片大小 */
+            .contact-center-pic {
+                width: min(72vw, 360px);
+                max-height: 58vh;
             }
         }
     </style>
 </head>
 <body>
+    <!-- 自定义鼠标层 -->
+    <div class="custom-cursor" aria-hidden="true"></div>
+
+    <!-- 左边固定大图 -->
     <div class="left-photo" aria-hidden="true">
         <img src="texture/mainbg.jpg" alt="">
     </div>
-    <a class="index-button" href="index.html">Index</a>
+
+    <!-- 按钮背后的云层 -->
+    <div class="nav-cloud" aria-hidden="true">
+        <img src="texture/cloud.png" alt="">
+    </div>
+
+    <!-- 五个页面按钮：Home / About Me / Artworks / Photographs / Contact -->
     <nav class="page-nav" aria-label="Primary navigation">
-        <a href="aboutme.html">About Me</a>
-        <a href="artworks.html">Artworks</a>
-        <a href="photographs.html">Photographs</a>
-        <a href="contact.html">Contact</a>
+        <a class="nav-home" href="#index" data-page-link="index"><img src="texture/home_button.png" alt="Home"></a>
+            <a class="nav-about" href="#aboutme" data-page-link="aboutme"><img src="texture/aboutme_button.png" alt="About Me"></a>
+        <div class="art-nav-group" data-art-group>
+            <a class="art-nav-main" href="#artworks" data-page-link="artworks"><img src="texture/artworks_button.png" alt="Artworks"></a>
+            <div class="art-branches">
+                <a class="branch-link" href="#artworks-1" data-page-link="artworks-1"><img src="texture/art_1.png" alt="Art branch 1"></a>
+                <a class="branch-link" href="#artworks-2" data-page-link="artworks-2"><img src="texture/art_2.png" alt="Art branch 2"></a>
+                <a class="branch-link" href="#artworks-3" data-page-link="artworks-3"><img src="texture/art_3.png" alt="Art branch 3"></a>
+                <a class="branch-link" href="#artworks-4" data-page-link="artworks-4"><img src="texture/art_4.png" alt="Art branch 4"></a>
+            </div>
+        </div>
+        <a class="nav-photo" href="#photographs" data-page-link="photographs"><img src="texture/photograhs_button.png" alt="Photographs"></a>
+        <a class="nav-contact" href="#contact" data-page-link="contact"><img src="texture/contact_button.png" alt="Contact"></a>
     </nav>
-    <div class="text-layer">Lynette Zhang</div>
+
+    <!-- 页面内容层：现在首页放的是签名，其他页以后可以继续加内容 -->
+    <main class="page-content" aria-live="polite">
+        <section class="page-panel" data-page="index">
+            <div class="text-layer"><img src="texture/signature.png" alt="Lynette Zhang signature"></div>
+        </section>
+        <section class="page-panel" data-page="aboutme">
+            <div class="page-title">
+                <div class="page-title-main">About me</div>
+            </div>
+            <div class="aboutme-side-pic">
+                <img src="texture/aboutme_pic.jpg" alt="About me image">
+            </div>
+        </section>
+        <section class="page-panel" data-page="artworks">
+            <div class="art-title">
+                <div class="art-title-main">Artworks</div>
+            </div>
+        </section>
+        <section class="page-panel" data-page="artworks-1">
+            <div class="art-title">
+                <div class="art-title-main">Artworks</div>
+                <div class="art-title-sub">before 2022</div>
+            </div>
+        </section>
+        <section class="page-panel" data-page="artworks-2">
+            <div class="art-title">
+                <div class="art-title-main">Artworks</div>
+                <div class="art-title-sub">after 2022</div>
+            </div>
+        </section>
+        <section class="page-panel" data-page="artworks-3">
+            <div class="art-title">
+                <div class="art-title-main">Artworks</div>
+                <div class="art-title-sub">made for fun</div>
+            </div>
+        </section>
+        <section class="page-panel" data-page="artworks-4">
+            <div class="art-title">
+                <div class="art-title-main">Artworks</div>
+                <div class="art-title-sub">student's work</div>
+            </div>
+        </section>
+        <section class="page-panel" data-page="photographs">
+            <div class="page-title">
+                <div class="page-title-main">Photograph</div>
+            </div>
+        </section>
+        <section class="page-panel" data-page="contact">
+            <div class="contact-center-pic">
+                <img src="texture/contact_bg1.png" alt="Contact image">
+            </div>
+        </section>
+    </main>
+    <script>
+        // 自定义鼠标逻辑：让图片鼠标跟着真实鼠标移动
+        (() => {
+            const cursor = document.querySelector(".custom-cursor");
+            const interactiveSelector = "a, button, [role='button'], input, textarea, select, label";
+            if (!cursor || window.matchMedia("(pointer: coarse)").matches) {
+                return;
+            }
+
+            // 判断当前鼠标是不是停在可点击元素上
+            const setHoverState = (target) => {
+                cursor.classList.toggle("is-hover", !!target.closest(interactiveSelector));
+            };
+
+            // 同步自定义鼠标位置
+            const syncCursor = (x, y, show = false) => {
+                cursor.style.left = x + "px";
+                cursor.style.top = y + "px";
+                if (show) {
+                    cursor.classList.add("is-ready");
+                }
+                const target = document.elementFromPoint(x, y);
+                if (target) {
+                    setHoverState(target);
+                }
+            };
+
+            window.addEventListener("mousemove", (event) => {
+                syncCursor(event.clientX, event.clientY, true);
+            });
+
+            window.addEventListener("mousedown", () => {
+                cursor.classList.add("is-active");
+            });
+
+            window.addEventListener("mouseup", () => {
+                cursor.classList.remove("is-active");
+            });
+
+            document.addEventListener("mouseover", (event) => {
+                setHoverState(event.target);
+            });
+        })();
+
+        // 单页切换逻辑：通过地址栏里的 #hash 切换五个页面状态
+        (() => {
+            const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "contact"];
+            const panels = Array.from(document.querySelectorAll("[data-page]"));
+            const links = Array.from(document.querySelectorAll("[data-page-link]"));
+            const artGroup = document.querySelector("[data-art-group]");
+            const artLinks = artGroup ? Array.from(artGroup.querySelectorAll("a")) : [];
+
+            // 读取当前 hash，判断要显示哪一页
+            const normalizePage = () => {
+                const raw = window.location.hash.replace("#", "").trim().toLowerCase();
+                return pageNames.includes(raw) ? raw : "index";
+            };
+
+            // 切换页面面板和当前按钮状态
+            const renderPage = () => {
+                const activePage = normalizePage();
+                document.documentElement.dataset.page = activePage;
+                document.body.classList.toggle("subpage-active", activePage !== "index");
+                document.body.classList.toggle("art-page-active", activePage.startsWith("artworks"));
+                if (document.activeElement instanceof HTMLElement) {
+                    document.activeElement.blur();
+                }
+                panels.forEach((panel) => {
+                    panel.classList.toggle("is-active", panel.dataset.page === activePage);
+                });
+                links.forEach((link) => {
+                    if (link.dataset.pageLink === "artworks") {
+                        link.classList.toggle("is-active", activePage.startsWith("artworks"));
+                    } else {
+                        link.classList.toggle("is-active", link.dataset.pageLink === activePage);
+                    }
+                });
+                if (artGroup) {
+                    artGroup.classList.toggle("is-current", activePage.startsWith("artworks"));
+                }
+                document.body.classList.add("page-ready");
+            };
+
+            if (artGroup) {
+                artLinks.forEach((link) => {
+                    link.addEventListener("click", (event) => {
+                        artGroup.classList.add("branches-locked");
+                        const clicked = event.currentTarget;
+                        requestAnimationFrame(() => {
+                            if (clicked instanceof HTMLElement) {
+                                clicked.blur();
+                            }
+                        });
+                    });
+                });
+
+                artGroup.addEventListener("mouseleave", () => {
+                    artGroup.classList.remove("branches-locked");
+                });
+            }
+
+            window.addEventListener("hashchange", renderPage);
+            renderPage();
+        })();
+    </script>
 </body>
 </html>
