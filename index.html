@@ -175,6 +175,81 @@
             height: auto;
         }
 
+        /* 音乐按钮
+           只有首页和 About me 页面会显示
+           left / bottom：控制按钮位置
+           width / height：控制按钮大小 */
+        .music-toggle {
+            position: fixed;
+            z-index: 11;
+            display: none;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+        }
+
+        html[data-page="index"] .music-toggle,
+        html[data-page="aboutme"] .music-toggle {
+            display: block;
+        }
+
+        /* 首页音乐按钮位置
+           left：离左边多远，数值越大越往右
+           bottom：离底部多远，数值越大越往上
+           width / height：按钮大小 */
+        html[data-page="index"] .music-toggle {
+            left: 1270px;
+            bottom: 147px;
+            width: 122px;
+            height: 122px;
+        }
+
+        /* About me 页面音乐按钮位置
+           left：离左边多远，数值越大越往右
+           bottom：离底部多远，数值越大越往上
+           width / height：按钮大小 */
+        html[data-page="aboutme"] .music-toggle {
+            left: 307px;
+            bottom: 622px;
+            width: 72px;
+            height: 60px;
+        }
+
+        .music-toggle:hover {
+            filter: brightness(0.92);
+            transform: scale(1.06);
+        }
+
+        .music-toggle:active {
+            filter: brightness(0.78);
+            transform: scale(0.88) rotate(-5deg);
+            transition-duration: 0.06s;
+        }
+
+        .music-toggle.is-playing {
+            filter: drop-shadow(0 0 8px rgba(255, 210, 245, 0.9));
+            transform: scale(1.02);
+        }
+
+        .music-toggle.is-playing:hover {
+            filter: brightness(0.94) drop-shadow(0 0 10px rgba(255, 210, 245, 0.95));
+            transform: scale(1.08);
+        }
+
+        .music-toggle.is-playing:active {
+            filter: brightness(0.78) drop-shadow(0 0 6px rgba(255, 210, 245, 0.75));
+            transform: scale(0.88) rotate(-5deg);
+        }
+
+        .music-toggle img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
         /* 顶部一级按钮盒子
            width / height：按钮大小 */
         .page-nav > a,
@@ -785,6 +860,22 @@
                 width: min(348px, calc(100vw + 36px));
             }
 
+            /* 手机端：首页音乐按钮位置和大小 */
+            html[data-page="index"] .music-toggle {
+                left: 18px;
+                bottom: 20px;
+                width: 58px;
+                height: 58px;
+            }
+
+            /* 手机端：About me 页面音乐按钮位置和大小 */
+            html[data-page="aboutme"] .music-toggle {
+                left: 18px;
+                bottom: 20px;
+                width: 58px;
+                height: 58px;
+            }
+
             /* 手机端按钮整组位置和宽度 */
             .page-nav {
                 top: 44px;
@@ -891,6 +982,12 @@
         <a class="nav-contact" href="#contact" data-page-link="contact"><img src="texture/contact_button.png" alt="Contact"></a>
     </nav>
 
+    <!-- 音乐按钮：只在首页和 About me 显示，点击播放 / 暂停 -->
+    <button class="music-toggle" type="button" data-music-toggle aria-label="Play music" aria-pressed="false">
+        <img src="texture/music_button.png" alt="">
+    </button>
+    <audio data-site-music src="music/music.mp3" preload="auto" loop autoplay></audio>
+
     <!-- 页面内容层：现在首页放的是签名，其他页以后可以继续加内容 -->
     <main class="page-content" aria-live="polite">
         <section class="page-panel" data-page="index">
@@ -995,6 +1092,48 @@
             const links = Array.from(document.querySelectorAll("[data-page-link]"));
             const artGroup = document.querySelector("[data-art-group]");
             const artLinks = artGroup ? Array.from(artGroup.querySelectorAll("a")) : [];
+            const music = document.querySelector("[data-site-music]");
+            const musicToggle = document.querySelector("[data-music-toggle]");
+            const musicPages = ["index", "aboutme"];
+            let musicShouldPlay = true;
+
+            // 同步音乐按钮状态：播放时按钮稍微变暗放大
+            const syncMusicButton = () => {
+                if (!music || !musicToggle) {
+                    return;
+                }
+                const isPlaying = !music.paused;
+                musicToggle.classList.toggle("is-playing", isPlaying);
+                musicToggle.setAttribute("aria-pressed", String(isPlaying));
+                musicToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+            };
+
+            // 暂停音乐：切到没有音乐的页面时会调用
+            const pauseMusic = () => {
+                if (!music) {
+                    return;
+                }
+                if (!music.paused) {
+                    music.pause();
+                }
+                syncMusicButton();
+            };
+
+            // 恢复音乐：如果之前是因为切页面被自动暂停，回到首页 / About me 后继续播放
+            const resumeMusic = async () => {
+                if (!music || !musicShouldPlay || !music.paused) {
+                    syncMusicButton();
+                    return;
+                }
+
+                try {
+                    await music.play();
+                } catch (error) {
+                    console.warn("Music resume was blocked by the browser.", error);
+                }
+
+                syncMusicButton();
+            };
 
             // 读取当前 hash，判断要显示哪一页
             const normalizePage = () => {
@@ -1024,8 +1163,54 @@
                 if (artGroup) {
                     artGroup.classList.toggle("is-current", activePage.startsWith("artworks"));
                 }
+                if (musicPages.includes(activePage)) {
+                    resumeMusic();
+                } else {
+                    pauseMusic();
+                }
                 document.body.classList.add("page-ready");
             };
+
+            if (music && musicToggle) {
+                musicToggle.addEventListener("click", async () => {
+                    const activePage = normalizePage();
+                    if (!musicPages.includes(activePage)) {
+                        pauseMusic();
+                        return;
+                    }
+
+                    if (music.paused) {
+                        musicShouldPlay = true;
+                        try {
+                            await music.play();
+                        } catch (error) {
+                            console.warn("Music play was blocked by the browser.", error);
+                        }
+                    } else {
+                        musicShouldPlay = false;
+                        music.pause();
+                    }
+
+                    syncMusicButton();
+                });
+
+                music.addEventListener("play", syncMusicButton);
+                music.addEventListener("pause", syncMusicButton);
+
+                // 有些浏览器会拦截打开网页就播放音乐；第一次点击页面时再补一次播放
+                const resumeMusicAfterFirstInteraction = (event) => {
+                    if (event.target instanceof HTMLElement && event.target.closest("[data-music-toggle]")) {
+                        return;
+                    }
+                    const activePage = normalizePage();
+                    if (musicShouldPlay && musicPages.includes(activePage)) {
+                        resumeMusic();
+                    }
+                };
+
+                window.addEventListener("pointerdown", resumeMusicAfterFirstInteraction, { once: true });
+                window.addEventListener("keydown", resumeMusicAfterFirstInteraction, { once: true });
+            }
 
             if (artGroup) {
                 artLinks.forEach((link) => {
