@@ -524,6 +524,7 @@
             right: calc(16vw - 70px);
             bottom: calc(28vh - 40px);
             z-index: 9;
+            width: min(56.1vw, 600px);
             pointer-events: none;
             overflow: visible;
         }
@@ -532,118 +533,42 @@
            width：签名大小，之后想放大/缩小主要改这里 */
         .text-layer img {
             display: block;
-            width: min(56.1vw, 600px);
+            width: 100%;
             height: auto;
             position: relative;
             z-index: 1;
         }
 
-        /* 主页签名的不规则小光点
-           left / top：控制这一小片闪光区域的位置
-           width / height：控制闪光区域大小，越小范围越集中
-           background 里的百分比：控制每颗光点在小区域里的位置
-           animation 时间越短，闪得越快
-           steps() 会让光点跳着闪，不会有整齐呼吸感 */
-        .text-layer::before,
-        .text-layer::after {
-            content: "";
+        /* 自动识别黄色星星的闪光画布
+           这个 canvas 会和签名图片完全重叠
+           闪光位置由 JS 自动读取 signature.png 里的黄色像素决定 */
+        .signature-sparkle-canvas {
             position: absolute;
-            left: 58%;
-            top: 0%;
-            width: 24%;
-            height: 72%;
+            inset: 0;
             z-index: 2;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            mix-blend-mode: screen;
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+            mix-blend-mode: normal;
         }
 
-        .text-layer::before {
-            background:
-                radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1.6px, transparent 3.4px) 8% 18% / 24px 24px no-repeat,
-                radial-gradient(circle, rgba(255, 205, 244, 0.88) 0 1.8px, transparent 3.8px) 18% 46% / 26px 26px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.4px, transparent 3.2px) 28% 26% / 22px 22px no-repeat,
-                radial-gradient(circle, rgba(208, 194, 255, 0.88) 0 1.7px, transparent 3.7px) 36% 64% / 25px 25px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.92) 0 1.5px, transparent 3.4px) 48% 38% / 24px 24px no-repeat,
-                radial-gradient(circle, rgba(255, 185, 235, 0.86) 0 1.7px, transparent 3.8px) 60% 72% / 26px 26px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.4px, transparent 3.2px) 72% 30% / 22px 22px no-repeat,
-                radial-gradient(circle, rgba(208, 194, 255, 0.84) 0 1.8px, transparent 3.9px) 86% 58% / 27px 27px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.88) 0 1.1px, transparent 2.8px) 14% 72% / 18px 18px no-repeat,
-                radial-gradient(circle, rgba(255, 210, 246, 0.78) 0 1.2px, transparent 3px) 40% 18% / 19px 19px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 1.1px, transparent 2.8px) 54% 84% / 18px 18px no-repeat,
-                radial-gradient(circle, rgba(208, 194, 255, 0.76) 0 1.2px, transparent 3px) 92% 24% / 19px 19px no-repeat;
-            animation: signature-sparkle-a 0.58s steps(2, end) infinite;
+        /* 首页右下角 title 图片
+           right：离右边多远，数值越大越往左
+           bottom：离底部多远，数值越大越往上
+           width：图片大小 */
+        .home-subtitle {
+            position: fixed;
+            right: 112px;
+            bottom: 5px;
+            z-index: 9;
+            width: 470px;
+            pointer-events: none;
         }
 
-        .text-layer::after {
-            background:
-                radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 1.4px, transparent 3.3px) 13% 66% / 23px 23px no-repeat,
-                radial-gradient(circle, rgba(255, 215, 250, 0.86) 0 1.7px, transparent 3.6px) 24% 30% / 25px 25px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.3px, transparent 3px) 34% 80% / 21px 21px no-repeat,
-                radial-gradient(circle, rgba(208, 194, 255, 0.9) 0 1.7px, transparent 3.8px) 45% 18% / 25px 25px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.94) 0 1.5px, transparent 3.4px) 56% 56% / 23px 23px no-repeat,
-                radial-gradient(circle, rgba(255, 190, 238, 0.84) 0 1.6px, transparent 3.7px) 66% 24% / 25px 25px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.92) 0 1.4px, transparent 3.2px) 78% 74% / 22px 22px no-repeat,
-                radial-gradient(circle, rgba(208, 194, 255, 0.86) 0 1.8px, transparent 4px) 92% 36% / 27px 27px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 2.7px) 6% 38% / 17px 17px no-repeat,
-                radial-gradient(circle, rgba(255, 190, 238, 0.78) 0 1.2px, transparent 3px) 30% 58% / 19px 19px no-repeat,
-                radial-gradient(circle, rgba(255, 255, 255, 0.86) 0 1.1px, transparent 2.8px) 70% 48% / 18px 18px no-repeat,
-                radial-gradient(circle, rgba(208, 194, 255, 0.78) 0 1.2px, transparent 3px) 84% 88% / 19px 19px no-repeat;
-            animation: signature-sparkle-b 0.43s steps(3, end) infinite;
-        }
-
-        @keyframes signature-sparkle-a {
-            0% {
-                opacity: 0.95;
-                transform: translate(0, 0) scale(1);
-            }
-
-            18% {
-                opacity: 0.12;
-                transform: translate(2px, -1px) scale(0.98);
-            }
-
-            41% {
-                opacity: 0.72;
-                transform: translate(-1px, 1px) scale(1.02);
-            }
-
-            63% {
-                opacity: 0.24;
-                transform: translate(1px, 2px) scale(0.99);
-            }
-
-            100% {
-                opacity: 0.86;
-                transform: translate(-2px, 0) scale(1.01);
-            }
-        }
-
-        @keyframes signature-sparkle-b {
-            0% {
-                opacity: 0.18;
-                transform: translate(1px, 1px) scale(0.99);
-            }
-
-            27% {
-                opacity: 0.88;
-                transform: translate(-1px, -2px) scale(1.02);
-            }
-
-            52% {
-                opacity: 0.08;
-                transform: translate(2px, 0) scale(0.97);
-            }
-
-            74% {
-                opacity: 0.98;
-                transform: translate(0, 2px) scale(1.01);
-            }
-
-            100% {
-                opacity: 0.34;
-                transform: translate(-2px, -1px) scale(1);
-            }
+        .home-subtitle img {
+            display: block;
+            width: 100%;
+            height: auto;
         }
 
         /* 单页切换的内容层
@@ -939,6 +864,13 @@
                 bottom: calc(22vh - 120px);
             }
 
+            /* 手机端首页右下角 title 图片 */
+            .home-subtitle {
+                right: 18px;
+                bottom: 18px;
+                width: 190px;
+            }
+
             .aboutme-side-pic {
                 width: 52vw;
             }
@@ -986,12 +918,18 @@
     <button class="music-toggle" type="button" data-music-toggle aria-label="Play music" aria-pressed="false">
         <img src="texture/music_button.png" alt="">
     </button>
-    <audio data-site-music src="music/music.mp3" preload="auto" loop autoplay></audio>
+    <audio data-site-music src="music/music.mp3" preload="auto" loop></audio>
 
     <!-- 页面内容层：现在首页放的是签名，其他页以后可以继续加内容 -->
     <main class="page-content" aria-live="polite">
         <section class="page-panel" data-page="index">
-            <div class="text-layer"><img src="texture/signature.png" alt="Lynette Zhang signature"></div>
+            <div class="text-layer">
+                <img src="texture/signature.png" alt="Lynette Zhang signature">
+                <canvas class="signature-sparkle-canvas" data-signature-sparkle aria-hidden="true"></canvas>
+            </div>
+            <div class="home-subtitle">
+                <img src="texture/titile.png" alt="Visual Artist & Educator">
+            </div>
         </section>
         <section class="page-panel" data-page="aboutme">
             <div class="page-title">
@@ -1085,6 +1023,218 @@
             });
         })();
 
+        // 首页签名黄色星星闪光：自动读取 signature.png 里的黄色像素，只在黄色区域闪
+        (() => {
+            const layer = document.querySelector(".text-layer");
+            const image = layer ? layer.querySelector("img") : null;
+            const canvas = layer ? layer.querySelector("[data-signature-sparkle]") : null;
+            const context = canvas ? canvas.getContext("2d") : null;
+
+            if (!layer || !image || !canvas || !context) {
+                return;
+            }
+
+            let yellowPoints = [];
+            let sparkles = [];
+            let lastRefresh = 0;
+            let animationId = 0;
+
+            // 如果浏览器不允许读取图片像素，就用这个备用区域。
+            // 这里的百分比是按 signature.png 整张图算的，覆盖黄色星星的大致范围。
+            const createFallbackYellowPoints = () => {
+                const width = image.naturalWidth || 1800;
+                const height = image.naturalHeight || 1200;
+                const points = [];
+                const left = width * 0.57;
+                const right = width * 0.79;
+                const top = height * 0.04;
+                const bottom = height * 0.59;
+                const centerX = (left + right) / 2;
+                const centerY = top + (bottom - top) * 0.43;
+
+                for (let index = 0; index < 900; index += 1) {
+                    const x = left + Math.random() * (right - left);
+                    const y = top + Math.random() * (bottom - top);
+                    const normalizedX = Math.abs(x - centerX) / ((right - left) / 2);
+                    const normalizedY = Math.abs(y - centerY) / ((bottom - top) / 2);
+
+                    // 简单做一个菱形 / 星星主体范围，避免备用点铺成矩形。
+                    if (normalizedX + normalizedY < 1.12 || (x > centerX && y > centerY && normalizedX < 0.34)) {
+                        points.push({ x, y });
+                    }
+                }
+
+                return points;
+            };
+
+            // 判断一个像素是不是黄色 / 金黄色
+            const isYellowPixel = (red, green, blue, alpha) => {
+                if (alpha < 50) {
+                    return false;
+                }
+
+                const max = Math.max(red, green, blue);
+                const min = Math.min(red, green, blue);
+                const chroma = max - min;
+                const hue = (() => {
+                    if (chroma === 0) {
+                        return 0;
+                    }
+                    if (max === red) {
+                        return ((green - blue) / chroma + (green < blue ? 6 : 0)) * 60;
+                    }
+                    if (max === green) {
+                        return ((blue - red) / chroma + 2) * 60;
+                    }
+                    return ((red - green) / chroma + 4) * 60;
+                })();
+                const saturation = max === 0 ? 0 : chroma / max;
+
+                return hue >= 28 && hue <= 66 && saturation > 0.35 && red > 150 && green > 95 && blue < 145;
+            };
+
+            // 从图片中收集黄色像素点。step 越小越精细，但计算越多。
+            const collectYellowPoints = () => {
+                const width = image.naturalWidth;
+                const height = image.naturalHeight;
+
+                if (!width || !height) {
+                    return [];
+                }
+
+                const sampleCanvas = document.createElement("canvas");
+                const sampleContext = sampleCanvas.getContext("2d", { willReadFrequently: true });
+                sampleCanvas.width = width;
+                sampleCanvas.height = height;
+                sampleContext.drawImage(image, 0, 0, width, height);
+
+                const pixels = sampleContext.getImageData(0, 0, width, height).data;
+                const points = [];
+                const step = 3;
+
+                for (let y = 0; y < height; y += step) {
+                    for (let x = 0; x < width; x += step) {
+                        const index = (y * width + x) * 4;
+                        if (isYellowPixel(pixels[index], pixels[index + 1], pixels[index + 2], pixels[index + 3])) {
+                            points.push({ x, y });
+                        }
+                    }
+                }
+
+                return points;
+            };
+
+            const resizeCanvas = () => {
+                const scale = window.devicePixelRatio || 1;
+                const rect = image.getBoundingClientRect();
+                const width = rect.width || image.clientWidth || image.naturalWidth;
+                const height = rect.height || image.clientHeight || image.naturalHeight;
+                canvas.style.width = width + "px";
+                canvas.style.height = height + "px";
+                canvas.width = Math.max(1, Math.round(width * scale));
+                canvas.height = Math.max(1, Math.round(height * scale));
+            };
+
+            // 每次刷新随机换一批星星，让它看起来是不规则闪动
+            const refreshSparkles = () => {
+                if (!yellowPoints.length) {
+                    sparkles = [];
+                    return;
+                }
+
+                const sparkleCount = Math.min(42, Math.max(18, Math.round(yellowPoints.length / 45)));
+                sparkles = Array.from({ length: sparkleCount }, () => {
+                    const point = yellowPoints[Math.floor(Math.random() * yellowPoints.length)];
+                    return {
+                        x: point.x,
+                        y: point.y,
+                        radius: 1.8 + Math.random() * 3.2,
+                        opacity: 0.55 + Math.random() * 0.45,
+                        color: Math.random() > 0.55 ? "255,255,255" : "255,226,145"
+                    };
+                });
+            };
+
+            const drawOneSparkle = (x, y, radius, color, opacity) => {
+                context.save();
+                context.globalAlpha = opacity;
+                context.shadowColor = "rgba(255, 255, 255, 1)";
+                context.shadowBlur = radius * 3.2;
+                context.strokeStyle = `rgba(${color}, 1)`;
+                context.fillStyle = `rgba(${color}, 1)`;
+                context.lineWidth = Math.max(1, radius * 0.38);
+                context.lineCap = "round";
+
+                context.beginPath();
+                context.moveTo(x - radius * 2.2, y);
+                context.lineTo(x + radius * 2.2, y);
+                context.moveTo(x, y - radius * 2.2);
+                context.lineTo(x, y + radius * 2.2);
+                context.stroke();
+
+                context.beginPath();
+                context.arc(x, y, radius * 0.55, 0, Math.PI * 2);
+                context.fill();
+
+                context.restore();
+            };
+
+            const drawSparkles = (time) => {
+                const activePage = document.documentElement.dataset.page || "index";
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (activePage === "index" && yellowPoints.length) {
+                    if (time - lastRefresh > 80) {
+                        refreshSparkles();
+                        lastRefresh = time;
+                    }
+
+                    const scaleX = canvas.width / image.naturalWidth;
+                    const scaleY = canvas.height / image.naturalHeight;
+
+                    sparkles.forEach((sparkle) => {
+                        const x = sparkle.x * scaleX;
+                        const y = sparkle.y * scaleY;
+                        const radius = sparkle.radius * (window.devicePixelRatio || 1);
+
+                        drawOneSparkle(x, y, radius, sparkle.color, sparkle.opacity);
+                    });
+                }
+
+                animationId = requestAnimationFrame(drawSparkles);
+            };
+
+            const startSparkles = () => {
+                try {
+                    yellowPoints = collectYellowPoints();
+                } catch (error) {
+                    console.warn("Could not read signature pixels for sparkle effect.", error);
+                }
+
+                if (!yellowPoints.length) {
+                    yellowPoints = createFallbackYellowPoints();
+                }
+
+                requestAnimationFrame(() => {
+                    resizeCanvas();
+                    refreshSparkles();
+                    cancelAnimationFrame(animationId);
+                    animationId = requestAnimationFrame(drawSparkles);
+                });
+            };
+
+            if (image.complete) {
+                startSparkles();
+            } else {
+                image.addEventListener("load", startSparkles, { once: true });
+            }
+
+            window.addEventListener("resize", resizeCanvas);
+            if ("ResizeObserver" in window) {
+                new ResizeObserver(resizeCanvas).observe(image);
+            }
+        })();
+
         // 单页切换逻辑：通过地址栏里的 #hash 切换五个页面状态
         (() => {
             const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "contact"];
@@ -1095,7 +1245,7 @@
             const music = document.querySelector("[data-site-music]");
             const musicToggle = document.querySelector("[data-music-toggle]");
             const musicPages = ["index", "aboutme"];
-            let musicShouldPlay = true;
+            let musicShouldPlay = false;
 
             // 同步音乐按钮状态：播放时按钮稍微变暗放大
             const syncMusicButton = () => {
@@ -1197,19 +1347,6 @@
                 music.addEventListener("play", syncMusicButton);
                 music.addEventListener("pause", syncMusicButton);
 
-                // 有些浏览器会拦截打开网页就播放音乐；第一次点击页面时再补一次播放
-                const resumeMusicAfterFirstInteraction = (event) => {
-                    if (event.target instanceof HTMLElement && event.target.closest("[data-music-toggle]")) {
-                        return;
-                    }
-                    const activePage = normalizePage();
-                    if (musicShouldPlay && musicPages.includes(activePage)) {
-                        resumeMusic();
-                    }
-                };
-
-                window.addEventListener("pointerdown", resumeMusicAfterFirstInteraction, { once: true });
-                window.addEventListener("keydown", resumeMusicAfterFirstInteraction, { once: true });
             }
 
             if (artGroup) {
