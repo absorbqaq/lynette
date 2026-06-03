@@ -14,8 +14,48 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playball&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playball&family=Kaushan+Script&family=Berkshire+Swash&family=Playfair+Display&display=swap" rel="stylesheet">
     <style>
+        /*
+        代码目录 / 以后找东西先看这里
+
+        00 基础设置：全站背景、隐藏系统鼠标、自定义鼠标
+        01 固定导航：右上角五个按钮、云朵、Art 分支、音乐按钮
+        02 首页 index：左侧图片、签名、黄色星星闪烁、右下角 title 图片
+        03 页面通用：所有页面面板、左上角标题样式
+        04 About 页面：背景、正文、Selected Exhibitions、右侧图片
+        05 Artworks 页面：Art 背景、分支背景、Art 标题颜色
+        06 Photograph 页面：背景、左上角标题颜色
+        07 Contact 页面：背景、中间 contact_bg1 图片
+        08 手机端：所有小屏幕单独位置和大小
+
+        HTML 内容顺序也在下面 main 里按：
+        index / aboutme / artworks / artworks-1 / artworks-2 / artworks-3 / artworks-4 / photographs / contact
+
+        部件速查 / 想改哪里就搜这些中文：
+        - 全站背景：搜“整站总背景”
+        - 自定义鼠标：搜“自定义鼠标”
+        - 右上角五个按钮：搜“右上角 5 个按钮”
+        - 按钮背后的云朵：搜“按钮背后的云层”
+        - 音乐按钮：首页位置搜“首页音乐按钮位置”，About 位置搜“About me 页面音乐按钮位置”
+        - 首页左侧大图：搜“左边的大图”
+        - 首页签名图片：搜“签名区域”
+        - 首页黄色星星闪烁：搜“黄色星星闪光”
+        - 首页右下角 title 图片：搜“首页右下角 title 图片”
+        - 每页左上角标题通用样式：搜“页面左上角标题”
+        - About 左上角标题颜色：搜“About 左上角标题颜色”
+        - About 正文：搜“About 页面中间偏左的正文”
+        - About 展览列表：搜“About 页面底部偏左的展览列表”
+        - About 右侧图片：搜“About Me 页面单独大图”
+        - Art 分支菜单：搜“Art 的四个分支菜单”
+        - Art 标题颜色：搜“Art 主页和前两个分支标题颜色”
+        - Photograph 标题颜色：搜“Photographs 页面标题颜色”
+        - Contact 中间图片：搜“Contact 页面中间图片”
+        - 手机端所有单独设置：搜“08 手机端”
+        */
+
+        /* ==================== 00 基础设置 ==================== */
+
         /* 基础重置：清掉浏览器默认边距，避免排版被影响 */
         * {
             margin: 0;
@@ -116,6 +156,8 @@
             background-image: url("texture/mouse_hover_cursor.png");
         }
 
+        /* ==================== 01 固定导航 / 按钮 / 音乐 ==================== */
+
         /* 按钮链接的基础样式 */
         .page-nav a {
             color: #fff;
@@ -210,7 +252,7 @@
            bottom：离底部多远，数值越大越往上
            width / height：按钮大小 */
         html[data-page="aboutme"] .music-toggle {
-            left: 307px;
+            left: 237px;
             bottom: 622px;
             width: 72px;
             height: 60px;
@@ -327,6 +369,12 @@
             transform: translate(0, 7px) scale(1);
         }
 
+        /* Home 按钮悬浮时的反馈 */
+        .page-nav > .nav-home:hover,
+        .page-nav > .nav-home:active {
+            transform: translateY(-8px) scale(1.04);
+        }
+
         /* About 按钮悬浮时的反馈 */
         .nav-about:hover,
         .nav-about:active {
@@ -427,6 +475,8 @@
             filter: none;
             box-shadow: none;
         }
+
+        /* ==================== 02 首页 index ==================== */
 
         /* 左边的大图
            left：图片往右移多少
@@ -562,7 +612,8 @@
             bottom: 5px;
             z-index: 9;
             width: 470px;
-            pointer-events: none;
+            pointer-events: auto;
+            transition: transform 0.18s ease, filter 0.18s ease;
         }
 
         .home-subtitle img {
@@ -570,6 +621,22 @@
             width: 100%;
             height: auto;
         }
+
+        /* 首页 title 图片悬浮 / 点击效果
+           hover：鼠标放上去时
+           active：点击按下去时 */
+        .home-subtitle:hover {
+            filter: brightness(1.08) drop-shadow(0 0 8px rgba(255, 255, 255, 0.45));
+            transform: scale(1.04);
+        }
+
+        .home-subtitle:active {
+            filter: brightness(0.9) drop-shadow(0 0 4px rgba(255, 255, 255, 0.35));
+            transform: scale(0.94);
+            transition-duration: 0.06s;
+        }
+
+        /* ==================== 03 页面通用 ==================== */
 
         /* 单页切换的内容层
            五个“页面”其实都挂在 index 里 */
@@ -593,7 +660,10 @@
         .page-panel.is-active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
+
+        /* ==================== 04 About 页面 ==================== */
 
         /* About Me 页面单独背景
            只会在 aboutme 这个页面状态显示 */
@@ -603,6 +673,15 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+
+        /* About 左上角标题颜色
+           只控制 About 页面左上角的 “About”
+           color：改标题颜色 */
+        .page-panel[data-page="aboutme"] .page-title {
+            color: #D727A1;
+        }
+
+        /* ==================== 05 Artworks 页面 ==================== */
 
         /* Art 主页和前 2 个分支统一背景
            第 3 / 第 4 个分支有自己的背景 */
@@ -631,6 +710,8 @@
             background-size: cover;
         }
 
+        /* ==================== 06 Photograph 页面 ==================== */
+
         /* Photographs 页面背景 */
         .page-panel[data-page="photographs"] {
             background-image: url("texture/photograph_bg.jpg");
@@ -638,6 +719,8 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
+
+        /* ==================== 07 Contact 页面 ==================== */
 
         /* Contact 页面背景 */
         .page-panel[data-page="contact"] {
@@ -669,6 +752,8 @@
             object-fit: contain;
         }
 
+        /* ==================== 03 页面通用：左上角标题 ==================== */
+
         /* 页面左上角标题
            left：控制离左边多远，数值越大越往右
            top：控制离上边多远，数值越大越往下
@@ -682,7 +767,7 @@
             top: 42px;
             z-index: 3;
             width: max-content;
-            font-family: "Pacifico", cursive;
+            font-family: "Berkshire Swash", "Pacifico", cursive;
             color: #fff;
             pointer-events: none;
         }
@@ -717,6 +802,76 @@
         /* Photographs 页面标题颜色 */
         .page-panel[data-page="photographs"] .page-title {
             color: #d0c2ff;
+        }
+
+        /* About 页面中间偏左的正文
+           left：离左边多远，数值越大越往右
+           top：离上边多远，数值越大越往下
+           width：文字块宽度
+           font-size：正文大小
+           line-height：行距 */
+        .aboutme-text {
+            position: absolute;
+            left: 8%;
+            top: 20%;
+            z-index: 3;
+            width: min(60vw, 760px);
+            color: #D727A1;
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: 19px;
+            font-style: normal;
+            line-height: 1.58;
+            letter-spacing: 0;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.28);
+            pointer-events: none;
+        }
+
+        .aboutme-text strong {
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .aboutme-text p {
+            margin: 0 0 18px;
+        }
+
+        .aboutme-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* About 页面底部偏左的展览列表
+           left：离左边多远，数值越大越往右
+           bottom：离底部多远，数值越大越往上
+           width：文字块宽度
+           font-size：文字大小 */
+        .aboutme-exhibitions {
+            position: absolute;
+            left: 8%;
+            bottom: 12%;
+            z-index: 3;
+            width: min(58vw, 760px);
+            color: #fff;
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: 14px;
+            font-style: normal;
+            line-height: 1.5;
+            letter-spacing: 0;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.28);
+            pointer-events: none;
+        }
+
+        .aboutme-exhibitions h2 {
+            margin: 0 0 8px;
+            font-size: 21px;
+            line-height: 1.1;
+            font-weight: 400;
+            font-style: normal;
+            text-align: left;
+            transform: translateX(0px);
+        }
+
+        .aboutme-exhibitions p {
+            margin: 0 0 5px;
         }
 
         /* About Me 页面单独大图
@@ -774,6 +929,8 @@
             object-fit: cover;
             object-position: center;
         }
+
+        /* ==================== 08 手机端 ==================== */
 
         /* 手机端单独规则
            小屏幕时，按钮 / 云层 / 左图 / 签名都在这里调 */
@@ -875,6 +1032,37 @@
                 width: 52vw;
             }
 
+            /* 手机端 About 页面正文位置和大小 */
+            .aboutme-text {
+                left: 24px;
+                top: 140px;
+                width: calc(100vw - 48px);
+                font-size: 16px;
+                line-height: 1.48;
+            }
+
+            .aboutme-text p {
+                margin-bottom: 12px;
+            }
+
+            /* 手机端 About 页面展览列表位置和大小 */
+            .aboutme-exhibitions {
+                left: 24px;
+                bottom: 28px;
+                width: calc(100vw - 48px);
+                font-size: 14px;
+                line-height: 1.35;
+            }
+
+            .aboutme-exhibitions h2 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+
+            .aboutme-exhibitions p {
+                margin-bottom: 4px;
+            }
+
             /* 手机端 Contact 中间图片大小 */
             .contact-center-pic {
                 width: min(72vw, 360px);
@@ -899,10 +1087,17 @@
 
     <!-- 五个页面按钮：Home / About Me / Artworks / Photographs / Contact -->
     <nav class="page-nav" aria-label="Primary navigation">
+        <!-- Home 按钮：点击回首页 index -->
         <a class="nav-home" href="#index" data-page-link="index"><img src="texture/home_button.png" alt="Home"></a>
-            <a class="nav-about" href="#aboutme" data-page-link="aboutme"><img src="texture/aboutme_button.png" alt="About Me"></a>
+
+        <!-- About 按钮：点击进入 aboutme 页面 -->
+        <a class="nav-about" href="#aboutme" data-page-link="aboutme"><img src="texture/aboutme_button.png" alt="About Me"></a>
+
+        <!-- Art 按钮组：点击主按钮进 Artworks，hover 会展开四个分支 -->
         <div class="art-nav-group" data-art-group>
             <a class="art-nav-main" href="#artworks" data-page-link="artworks"><img src="texture/artworks_button.png" alt="Artworks"></a>
+
+            <!-- Art 四个分支按钮：从上到下对应 artworks-1 到 artworks-4 -->
             <div class="art-branches">
                 <a class="branch-link" href="#artworks-1" data-page-link="artworks-1"><img src="texture/art_1.png" alt="Art branch 1"></a>
                 <a class="branch-link" href="#artworks-2" data-page-link="artworks-2"><img src="texture/art_2.png" alt="Art branch 2"></a>
@@ -910,7 +1105,11 @@
                 <a class="branch-link" href="#artworks-4" data-page-link="artworks-4"><img src="texture/art_4.png" alt="Art branch 4"></a>
             </div>
         </div>
+
+        <!-- Photograph 按钮：点击进入 photographs 页面 -->
         <a class="nav-photo" href="#photographs" data-page-link="photographs"><img src="texture/photograhs_button.png" alt="Photographs"></a>
+
+        <!-- Contact 按钮：点击进入 contact 页面 -->
         <a class="nav-contact" href="#contact" data-page-link="contact"><img src="texture/contact_button.png" alt="Contact"></a>
     </nav>
 
@@ -922,58 +1121,103 @@
 
     <!-- 页面内容层：现在首页放的是签名，其他页以后可以继续加内容 -->
     <main class="page-content" aria-live="polite">
+        <!-- ==================== index 首页 ==================== -->
         <section class="page-panel" data-page="index">
+            <!-- 首页签名图片 + 黄色星星闪烁 canvas -->
             <div class="text-layer">
                 <img src="texture/signature.png" alt="Lynette Zhang signature">
                 <canvas class="signature-sparkle-canvas" data-signature-sparkle aria-hidden="true"></canvas>
             </div>
-            <div class="home-subtitle">
+
+            <!-- 首页右下角 title 图片，点击跳到 About 页面 -->
+            <a class="home-subtitle" href="#aboutme" data-page-link="aboutme" aria-label="Go to About me">
                 <img src="texture/titile.png" alt="Visual Artist & Educator">
-            </div>
+            </a>
         </section>
+
+        <!-- ==================== aboutme 页面 ==================== -->
         <section class="page-panel" data-page="aboutme">
+            <!-- About 页面左上角标题 -->
             <div class="page-title">
-                <div class="page-title-main">About me</div>
+                <div class="page-title-main">About</div>
             </div>
+
+            <!-- About 页面中间偏左的个人简介文字 -->
+            <div class="aboutme-text">
+                <p><strong>Lynette Zhang</strong> is a visual artist and educator based in Ontario, Canada. She works across sculpture, painting, and mixed media, with a practice rooted in visual documentation, observation-based approaches, and material exploration.</p>
+                <p>She holds a Bachelor of Fine Arts (Honours) from Queen&rsquo;s University and is currently completing Concurrent Education. Her work moves between studio-based making and educational contexts, where processes of learning, research, and making inform one another.</p>
+                <p>Through attention to everyday observation and visual experience, her practice considers how encounters with the surrounding environment can be translated through form, surface, and material transformation.</p>
+            </div>
+
+            <!-- About 页面底部偏左的 Selected Exhibitions 展览列表 -->
+            <div class="aboutme-exhibitions">
+                <h2>Selected Exhibitions</h2>
+                <p>Pillowtalk (Solo Exhibition), Union Gallery, Queen&rsquo;s University, Kingston, ON, 2025</p>
+                <p>Obsolescence (Graduating Exhibition), Ontario Hall, Queen&rsquo;s University, Kingston, ON, 2025</p>
+                <p>Mice on Venus (Group Exhibition), Union Gallery, Queen&rsquo;s University, Kingston, ON, 2023</p>
+            </div>
+
+            <!-- About 页面右侧图片 -->
             <div class="aboutme-side-pic">
                 <img src="texture/aboutme_pic.jpg" alt="About me image">
             </div>
         </section>
+
+        <!-- ==================== artworks 主页面 ==================== -->
         <section class="page-panel" data-page="artworks">
+            <!-- Artworks 主页面左上角标题 -->
             <div class="art-title">
                 <div class="art-title-main">Artworks</div>
             </div>
         </section>
+
+        <!-- ==================== artworks-1 分支页面 ==================== -->
         <section class="page-panel" data-page="artworks-1">
+            <!-- Artworks 第 1 个分支标题和小字 -->
             <div class="art-title">
                 <div class="art-title-main">Artworks</div>
                 <div class="art-title-sub">before 2022</div>
             </div>
         </section>
+
+        <!-- ==================== artworks-2 分支页面 ==================== -->
         <section class="page-panel" data-page="artworks-2">
+            <!-- Artworks 第 2 个分支标题和小字 -->
             <div class="art-title">
                 <div class="art-title-main">Artworks</div>
                 <div class="art-title-sub">after 2022</div>
             </div>
         </section>
+
+        <!-- ==================== artworks-3 分支页面 ==================== -->
         <section class="page-panel" data-page="artworks-3">
+            <!-- Artworks 第 3 个分支标题和小字 -->
             <div class="art-title">
                 <div class="art-title-main">Artworks</div>
                 <div class="art-title-sub">made for fun</div>
             </div>
         </section>
+
+        <!-- ==================== artworks-4 分支页面 ==================== -->
         <section class="page-panel" data-page="artworks-4">
+            <!-- Artworks 第 4 个分支标题和小字 -->
             <div class="art-title">
                 <div class="art-title-main">Artworks</div>
                 <div class="art-title-sub">student's work</div>
             </div>
         </section>
+
+        <!-- ==================== photographs 页面 ==================== -->
         <section class="page-panel" data-page="photographs">
+            <!-- Photograph 页面左上角标题 -->
             <div class="page-title">
                 <div class="page-title-main">Photograph</div>
             </div>
         </section>
+
+        <!-- ==================== contact 页面 ==================== -->
         <section class="page-panel" data-page="contact">
+            <!-- Contact 页面中间图片 contact_bg1.png -->
             <div class="contact-center-pic">
                 <img src="texture/contact_bg1.png" alt="Contact image">
             </div>
