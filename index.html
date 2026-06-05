@@ -382,7 +382,7 @@
         }
 
         .photo-nav-group {
-            transform: translate(0, 7px) scale(1);
+            transform: translate(0, -9px) scale(1);
         }
 
         /* Home 按钮悬浮时的反馈 */
@@ -400,7 +400,7 @@
         /* Photo / Contact 按钮悬浮时的反馈 */
         .nav-contact:hover,
         .nav-contact:active {
-            transform: translate(0, 7px) scale(1.04);
+            transform: translate(0, 24px) scale(1.04);
         }
 
         .photo-nav-group:hover .photo-nav-main,
@@ -429,7 +429,14 @@
         /* Photo 三个分支按钮间距
            gap：数值越小，三个分支上下越靠近 */
         .photo-branches {
-            gap: 0;
+            gap: 113;
+        }
+
+        /* 展开分支之间再往上压一点
+           因为 PNG 自身会有少量透明边缘，gap 设成 0 视觉上也可能还有缝 */
+        .art-branches .branch-link + .branch-link,
+        .photo-branches .branch-link + .branch-link {
+            margin-top: 0px;
         }
 
         /* 这个透明连接带专门用来防止鼠标从 Art 主按钮滑向分支时断开 hover */
@@ -876,7 +883,7 @@
         /* Portrait 页面所有组的总容器
            margin-top：控制图库整体离页面顶部多远
            width：控制所有照片总体宽度
-           gap：控制组和组之间的上下间隔 */
+           gap：控制组和组之间的上下间隔，所有组都统一 */
         .portrait-gallery {
             position: relative;
             z-index: 2;
@@ -884,12 +891,12 @@
             margin: 178px auto 120px;
             display: flex;
             flex-direction: column;
-            gap: 64px;
+            gap: var(--portrait-section-gap, 56px);
         }
 
         /* Portrait 每一个组
            每个 group 是一组图片
-           height：每个 group 固定一样高，所以组间距不会忽大忽小 */
+           height：每个 group 可以不同，由 JS 里的 bento 设置控制 */
         .portrait-group {
             width: 100%;
             height: var(--portrait-group-height, 600px);
@@ -907,10 +914,10 @@
             letter-spacing: 0;
         }
 
-        /* Portrait 固定画布拼贴
+        /* Portrait Bento Grid
            每个 group 都是 24 x 12 的网格
-           JS 会按每组照片数量自动安排每张图占哪几格
-           gap：照片之间的缝隙，想更密就调小 */
+           每组可以有不同高度和不同大小的格子
+           gap：组内照片之间的缝隙，所有组统一 */
         .portrait-masonry {
             width: 100%;
             height: 100%;
@@ -918,7 +925,7 @@
             display: grid;
             grid-template-columns: repeat(24, 1fr);
             grid-template-rows: repeat(12, 1fr);
-            gap: 18px;
+            gap: var(--portrait-tile-gap, 18px);
             overflow: hidden;
         }
 
@@ -976,10 +983,10 @@
         .aboutme-text {
             position: absolute;
             left: 8%;
-            top: 18%;
+            top: 20%;
             z-index: 3;
             width: min(60vw, 760px);
-            color: #D727A1;
+            color: #fff;
             font-family: "Playfair Display", Georgia, serif;
             font-size: 18px;
             font-style: normal;
@@ -1157,6 +1164,11 @@
                 gap: 0;
             }
 
+            .art-branches .branch-link + .branch-link,
+            .photo-branches .branch-link + .branch-link {
+                margin-top: -8px;
+            }
+
             .branch-link {
                 width: 98px;
                 height: auto;
@@ -1170,7 +1182,7 @@
             }
 
             .portrait-group {
-                height: 390px;
+                height: calc(var(--portrait-group-height, 600px) * 0.72);
             }
 
             .portrait-masonry {
@@ -1820,9 +1832,7 @@
                     images: [
                         "portrait_group5_1.jpg",
                         "portrait_group5_2.jpg",
-                        "portrait_group5_3.jpg",
-                        "portrait_group5_4.jpg",
-                        "portrait_group5_5.jpg"
+                        "portrait_group5_3.jpg"
                     ]
                 },
                 {
@@ -1900,109 +1910,143 @@
                 return "texture/" + fileName;
             };
 
-            // Portrait 固定画布模板：
-            // 每组都是 12 x 12 网格，图片会裁剪填满格子
-            // 如果以后某一组想单独改排版，就改这里对应数量的 column / row
-            const portraitGridPattern = (count) => {
-                const patterns = {
-                    3: [
-                        { column: "3 / 9", row: "2 / 12" },
-                        { column: "10 / 16", row: "2 / 12" },
-                        { column: "17 / 23", row: "2 / 12" }
-                    ],
-                    4: [
-                        { column: "2 / 7", row: "3 / 11" },
-                        { column: "7 / 12", row: "3 / 11" },
-                        { column: "13 / 18", row: "3 / 11" },
-                        { column: "18 / 23", row: "3 / 11" }
-                    ],
-                    5: [
-                        { column: "2 / 6", row: "3 / 11" },
-                        { column: "6 / 10", row: "3 / 11" },
-                        { column: "10 / 14", row: "3 / 11" },
-                        { column: "14 / 18", row: "3 / 11" },
-                        { column: "18 / 22", row: "3 / 11" }
-                    ],
-                    6: [
-                        { column: "1 / 5", row: "3 / 11" },
-                        { column: "5 / 9", row: "3 / 11" },
-                        { column: "9 / 13", row: "3 / 11" },
-                        { column: "13 / 17", row: "3 / 11" },
-                        { column: "17 / 21", row: "3 / 11" },
-                        { column: "21 / 25", row: "3 / 11" }
-                    ],
-                    7: [
-                        { column: "4 / 8", row: "1 / 7" },
-                        { column: "8 / 12", row: "1 / 7" },
-                        { column: "12 / 16", row: "1 / 7" },
-                        { column: "16 / 20", row: "1 / 7" },
-                        { column: "6 / 10", row: "7 / 13" },
-                        { column: "10 / 14", row: "7 / 13" },
-                        { column: "14 / 18", row: "7 / 13" }
-                    ],
-                    8: [
-                        { column: "4 / 8", row: "1 / 7" },
-                        { column: "8 / 12", row: "1 / 7" },
-                        { column: "12 / 16", row: "1 / 7" },
-                        { column: "16 / 20", row: "1 / 7" },
-                        { column: "4 / 8", row: "7 / 13" },
-                        { column: "8 / 12", row: "7 / 13" },
-                        { column: "12 / 16", row: "7 / 13" },
-                        { column: "16 / 20", row: "7 / 13" }
-                    ],
-                    9: [
-                        { column: "1 / 5", row: "1 / 7" },
-                        { column: "5 / 9", row: "1 / 7" },
-                        { column: "9 / 13", row: "1 / 7" },
-                        { column: "13 / 17", row: "1 / 7" },
-                        { column: "17 / 21", row: "1 / 7" },
-                        { column: "5 / 9", row: "7 / 13" },
-                        { column: "9 / 13", row: "7 / 13" },
-                        { column: "13 / 17", row: "7 / 13" },
-                        { column: "17 / 21", row: "7 / 13" }
-                    ],
-                    10: [
-                        { column: "1 / 5", row: "1 / 7" },
-                        { column: "5 / 9", row: "1 / 7" },
-                        { column: "9 / 13", row: "1 / 7" },
-                        { column: "13 / 17", row: "1 / 7" },
-                        { column: "17 / 21", row: "1 / 7" },
-                        { column: "5 / 9", row: "7 / 13" },
-                        { column: "9 / 13", row: "7 / 13" },
-                        { column: "13 / 17", row: "7 / 13" },
-                        { column: "17 / 21", row: "7 / 13" },
-                        { column: "21 / 25", row: "7 / 13" }
-                    ],
-                    11: [
-                        { column: "1 / 5", row: "1 / 7" },
-                        { column: "5 / 9", row: "1 / 7" },
-                        { column: "9 / 13", row: "1 / 7" },
-                        { column: "13 / 17", row: "1 / 7" },
-                        { column: "17 / 21", row: "1 / 7" },
-                        { column: "21 / 25", row: "1 / 7" },
-                        { column: "3 / 7", row: "7 / 13" },
-                        { column: "7 / 11", row: "7 / 13" },
-                        { column: "11 / 15", row: "7 / 13" },
-                        { column: "15 / 19", row: "7 / 13" },
-                        { column: "19 / 23", row: "7 / 13" }
-                    ],
-                    12: [
-                        { column: "1 / 5", row: "1 / 7" },
-                        { column: "5 / 9", row: "1 / 7" },
-                        { column: "9 / 13", row: "1 / 7" },
-                        { column: "13 / 17", row: "1 / 7" },
-                        { column: "17 / 21", row: "1 / 7" },
-                        { column: "21 / 25", row: "1 / 7" },
-                        { column: "1 / 5", row: "7 / 13" },
-                        { column: "5 / 9", row: "7 / 13" },
-                        { column: "9 / 13", row: "7 / 13" },
-                        { column: "13 / 17", row: "7 / 13" },
-                        { column: "17 / 21", row: "7 / 13" },
-                        { column: "21 / 25", row: "7 / 13" }
-                    ]
+            // Portrait Bento Grid 设置：
+            // height：这一组自己的高度，组大小可以不同
+            // cells：每张图在 24 x 12 网格里占的位置
+            // 所有组之间的上下间距由 CSS 的 .portrait-gallery gap 统一控制
+            const portraitBentoLayout = (count) => {
+                const layouts = {
+                    3: {
+                        height: 360,
+                        cells: [
+                            { column: "2 / 9", row: "1 / 13" },
+                            { column: "9 / 16", row: "1 / 13" },
+                            { column: "16 / 23", row: "1 / 13" }
+                        ]
+                    },
+                    4: {
+                        height: 420,
+                        cells: [
+                            { column: "2 / 8", row: "1 / 13" },
+                            { column: "8 / 13", row: "2 / 12" },
+                            { column: "13 / 18", row: "2 / 12" },
+                            { column: "18 / 24", row: "1 / 13" }
+                        ]
+                    },
+                    5: {
+                        height: 460,
+                        cells: [
+                            { column: "1 / 6", row: "1 / 13" },
+                            { column: "6 / 11", row: "2 / 12" },
+                            { column: "11 / 16", row: "1 / 13" },
+                            { column: "16 / 21", row: "2 / 12" },
+                            { column: "21 / 25", row: "1 / 13" }
+                        ]
+                    },
+                    6: {
+                        height: 480,
+                        cells: [
+                            { column: "1 / 5", row: "1 / 13" },
+                            { column: "5 / 9", row: "2 / 12" },
+                            { column: "9 / 13", row: "1 / 13" },
+                            { column: "13 / 17", row: "2 / 12" },
+                            { column: "17 / 21", row: "1 / 13" },
+                            { column: "21 / 25", row: "2 / 12" }
+                        ]
+                    },
+                    7: {
+                        height: 560,
+                        cells: [
+                            { column: "1 / 7", row: "1 / 7" },
+                            { column: "7 / 12", row: "1 / 7" },
+                            { column: "12 / 17", row: "1 / 7" },
+                            { column: "17 / 23", row: "1 / 7" },
+                            { column: "4 / 10", row: "7 / 13" },
+                            { column: "10 / 16", row: "7 / 13" },
+                            { column: "16 / 22", row: "7 / 13" }
+                        ]
+                    },
+                    8: {
+                        height: 560,
+                        cells: [
+                            { column: "1 / 7", row: "1 / 7" },
+                            { column: "7 / 13", row: "1 / 7" },
+                            { column: "13 / 19", row: "1 / 7" },
+                            { column: "19 / 25", row: "1 / 7" },
+                            { column: "1 / 7", row: "7 / 13" },
+                            { column: "7 / 13", row: "7 / 13" },
+                            { column: "13 / 19", row: "7 / 13" },
+                            { column: "19 / 25", row: "7 / 13" }
+                        ]
+                    },
+                    9: {
+                        height: 620,
+                        cells: [
+                            { column: "1 / 6", row: "1 / 7" },
+                            { column: "6 / 11", row: "1 / 7" },
+                            { column: "11 / 16", row: "1 / 7" },
+                            { column: "16 / 21", row: "1 / 7" },
+                            { column: "21 / 25", row: "1 / 7" },
+                            { column: "3 / 8", row: "7 / 13" },
+                            { column: "8 / 13", row: "7 / 13" },
+                            { column: "13 / 18", row: "7 / 13" },
+                            { column: "18 / 23", row: "7 / 13" }
+                        ]
+                    },
+                    10: {
+                        height: 620,
+                        cells: [
+                            { column: "1 / 6", row: "1 / 7" },
+                            { column: "6 / 11", row: "1 / 7" },
+                            { column: "11 / 16", row: "1 / 7" },
+                            { column: "16 / 21", row: "1 / 7" },
+                            { column: "21 / 25", row: "1 / 7" },
+                            { column: "1 / 6", row: "7 / 13" },
+                            { column: "6 / 11", row: "7 / 13" },
+                            { column: "11 / 16", row: "7 / 13" },
+                            { column: "16 / 21", row: "7 / 13" },
+                            { column: "21 / 25", row: "7 / 13" }
+                        ]
+                    },
+                    11: {
+                        height: 660,
+                        cells: [
+                            { column: "1 / 5", row: "1 / 7" },
+                            { column: "5 / 9", row: "1 / 7" },
+                            { column: "9 / 13", row: "1 / 7" },
+                            { column: "13 / 17", row: "1 / 7" },
+                            { column: "17 / 21", row: "1 / 7" },
+                            { column: "21 / 25", row: "1 / 7" },
+                            { column: "3 / 8", row: "7 / 13" },
+                            { column: "8 / 13", row: "7 / 13" },
+                            { column: "13 / 18", row: "7 / 13" },
+                            { column: "18 / 23", row: "7 / 13" },
+                            { column: "1 / 3", row: "7 / 13" }
+                        ]
+                    },
+                    12: {
+                        height: 660,
+                        cells: [
+                            { column: "1 / 5", row: "1 / 7" },
+                            { column: "5 / 9", row: "1 / 7" },
+                            { column: "9 / 13", row: "1 / 7" },
+                            { column: "13 / 17", row: "1 / 7" },
+                            { column: "17 / 21", row: "1 / 7" },
+                            { column: "21 / 25", row: "1 / 7" },
+                            { column: "1 / 5", row: "7 / 13" },
+                            { column: "5 / 9", row: "7 / 13" },
+                            { column: "9 / 13", row: "7 / 13" },
+                            { column: "13 / 17", row: "7 / 13" },
+                            { column: "17 / 21", row: "7 / 13" },
+                            { column: "21 / 25", row: "7 / 13" }
+                        ]
+                    }
                 };
 
-                return patterns[count] || patterns[12].slice(0, count);
+                return layouts[count] || {
+                    height: 660,
+                    cells: layouts[12].cells.slice(0, count)
+                };
             };
 
             portraitGroups.forEach((group, groupIndex) => {
@@ -2021,7 +2065,9 @@
                 const masonry = document.createElement("div");
                 masonry.className = "portrait-masonry";
                 masonry.dataset.count = String(group.images.length);
-                const gridPattern = portraitGridPattern(group.images.length);
+                const bentoLayout = portraitBentoLayout(group.images.length);
+                const gridPattern = bentoLayout.cells;
+                section.style.setProperty("--portrait-group-height", bentoLayout.height + "px");
 
                 section.appendChild(masonry);
                 gallery.appendChild(section);
