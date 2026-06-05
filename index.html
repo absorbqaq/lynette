@@ -6,7 +6,7 @@
     <title>Home</title>
     <script>
         (() => {
-            const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "contact"];
+            const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "photographs-1", "photographs-2", "photographs-3", "contact"];
             const raw = window.location.hash.replace("#", "").trim().toLowerCase();
             const page = pageNames.includes(raw) ? raw : "index";
             document.documentElement.dataset.page = page;
@@ -101,8 +101,15 @@
             background-image: url("texture/artwork4_bg.jpg");
         }
 
-        html[data-page="photographs"] body {
+        html[data-page="photographs"] body,
+        html[data-page="photographs-1"] body,
+        html[data-page="photographs-2"] body,
+        html[data-page="photographs-3"] body {
             background-image: url("texture/photograph_bg.jpg");
+        }
+
+        html[data-page="photographs-1"] body {
+            background-image: url("texture/portrait_bg.jpg");
         }
 
         html[data-page="contact"] body {
@@ -310,12 +317,14 @@
         }
 
         /* Art 主按钮分组需要让分支可以溢出显示 */
-        .art-nav-group {
+        .art-nav-group,
+        .photo-nav-group {
             overflow: visible;
         }
 
-        /* Art 主按钮本体 */
-        .art-nav-main {
+        /* Art / Photo 主按钮本体 */
+        .art-nav-main,
+        .photo-nav-main {
             position: relative;
             width: 77px;
             height: 77px;
@@ -327,7 +336,8 @@
         /* 顶部一级按钮图片本体
            object-fit: contain 表示完整显示图片，不裁切 */
         .page-nav > a img,
-        .art-nav-main img {
+        .art-nav-main img,
+        .photo-nav-main img {
             position: absolute;
             left: 0;
             right: 0;
@@ -342,7 +352,8 @@
 
         /* 当前页面按钮状态预留 */
         .page-nav > a.is-active,
-        .art-nav-main.is-active {
+        .art-nav-main.is-active,
+        .photo-nav-main.is-active {
             opacity: 1;
         }
 
@@ -352,7 +363,9 @@
         .page-nav > a:hover,
         .page-nav > a:active,
         .art-nav-group:hover .art-nav-main,
-        .art-nav-main:active {
+        .art-nav-main:active,
+        .photo-nav-group:hover .photo-nav-main,
+        .photo-nav-main:active {
             filter: brightness(0.88);
             transform: scale(1.04);
         }
@@ -364,8 +377,11 @@
         }
 
         /* 第 4 / 5 个按钮再单独微调 */
-        .nav-photo,
         .nav-contact {
+            transform: translate(0, 7px) scale(1);
+        }
+
+        .photo-nav-group {
             transform: translate(0, 7px) scale(1);
         }
 
@@ -382,17 +398,21 @@
         }
 
         /* Photo / Contact 按钮悬浮时的反馈 */
-        .nav-photo:hover,
-        .nav-photo:active,
         .nav-contact:hover,
         .nav-contact:active {
             transform: translate(0, 7px) scale(1.04);
         }
 
+        .photo-nav-group:hover .photo-nav-main,
+        .photo-nav-main:active {
+            transform: scale(1.04);
+        }
+
         /* Art 的四个分支菜单
            top：控制分支出现在主按钮下方多远
            gap：控制分支图片之间间距 */
-        .art-branches {
+        .art-branches,
+        .photo-branches {
             position: absolute;
             top: calc(100% + 6px);
             left: 50%;
@@ -406,8 +426,15 @@
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
+        /* Photo 三个分支按钮间距
+           gap：数值越小，三个分支上下越靠近 */
+        .photo-branches {
+            gap: 3px;
+        }
+
         /* 这个透明连接带专门用来防止鼠标从 Art 主按钮滑向分支时断开 hover */
-        .art-branches::before {
+        .art-branches::before,
+        .photo-branches::before {
             content: "";
             position: absolute;
             left: 0;
@@ -423,9 +450,17 @@
             transform: translateX(-50%) scale(1);
         }
 
+        /* 鼠标移到 Photo 主按钮区域时，展开 3 个分支 */
+        .photo-nav-group:hover .photo-branches {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) scale(1);
+        }
+
         /* 点进 art 页面后，先强制把分支锁住收回；
            只有鼠标离开再重新移回 Art，才会再次展开 */
-        .art-nav-group.branches-locked .art-branches {
+        .art-nav-group.branches-locked .art-branches,
+        .photo-nav-group.branches-locked .photo-branches {
             opacity: 0;
             pointer-events: none;
             transform: translateX(-50%) scale(0.96);
@@ -433,6 +468,13 @@
 
         /* 只要已经进入任何 art 页面，就不要再自动展开分支菜单 */
         body.art-page-active .art-branches {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%) scale(0.96);
+        }
+
+        /* 只要已经进入任何 photograph 页面，就不要再自动展开分支菜单 */
+        body.photo-page-active .photo-branches {
             opacity: 0;
             pointer-events: none;
             transform: translateX(-50%) scale(0.96);
@@ -713,7 +755,10 @@
         /* ==================== 06 Photograph 页面 ==================== */
 
         /* Photographs 页面背景 */
-        .page-panel[data-page="photographs"] {
+        .page-panel[data-page="photographs"],
+        .page-panel[data-page="photographs-1"],
+        .page-panel[data-page="photographs-2"],
+        .page-panel[data-page="photographs-3"] {
             background-image: url("texture/photograph_bg.jpg");
             background-position: center;
             background-repeat: no-repeat;
@@ -779,7 +824,8 @@
             white-space: nowrap;
         }
 
-        .art-title-sub {
+        .art-title-sub,
+        .page-title-sub {
             display: block;
             margin-top: 6px;
             font-size: 32px;
@@ -800,8 +846,118 @@
         }
 
         /* Photographs 页面标题颜色 */
-        .page-panel[data-page="photographs"] .page-title {
+        .page-panel[data-page="photographs"] .page-title,
+        .page-panel[data-page="photographs-1"] .page-title,
+        .page-panel[data-page="photographs-2"] .page-title,
+        .page-panel[data-page="photographs-3"] .page-title {
             color: #d0c2ff;
+        }
+
+        /* Portrait 页面：photographs-1 分支
+           这是用来放人物肖像很多照片的页面
+           background-color：页面纯白背景
+           overflow-y：照片很多时，这个页面自己可以上下滚动 */
+        .page-panel[data-page="photographs-1"] {
+            background-image: url("texture/portrait_bg.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        /* Portrait 页面所有组的总容器
+           margin-top：控制图库整体离页面顶部多远
+           width：控制所有照片总体宽度
+           gap：控制组和组之间的上下间隔 */
+        .portrait-gallery {
+            position: relative;
+            z-index: 2;
+            width: min(94vw, 1680px);
+            margin: 178px auto 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 64px;
+        }
+
+        /* Portrait 每一个组
+           每个 group 是一组图片
+           height：每个 group 固定一样高，所以组间距不会忽大忽小 */
+        .portrait-group {
+            width: 100%;
+            height: var(--portrait-group-height, 470px);
+        }
+
+        /* Portrait 组标题，可选
+           如果某一组以后需要名字，就在 JS 里填 title */
+        .portrait-group-title {
+            margin: 0 auto 22px;
+            width: min(100%, 980px);
+            color: #111;
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        /* Portrait 固定画布拼贴
+           每个 group 都是 24 x 12 的网格
+           JS 会按每组照片数量自动安排每张图占哪几格
+           gap：照片之间的缝隙，想更密就调小 */
+        .portrait-masonry {
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        /* Portrait 每张照片
+           object-fit: cover 表示图片会裁剪一点来填满格子
+           现在允许裁剪，所以画面会更满
+           loading="lazy" 会让图片滚到附近才加载 */
+        .portrait-photo {
+            display: block;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* Portrait 图片悬浮预览层
+           鼠标放到小图上时，屏幕中间会出现完整大图
+           width / height：控制中间预览固定大小
+           object-fit: contain：完整显示，不裁剪 */
+        .image-hover-preview {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 80;
+            width: min(58vw, 620px);
+            height: min(74vh, 720px);
+            transform: translate(-50%, -50%) scale(0.98);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+        }
+
+        .image-hover-preview.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .image-hover-preview img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
         }
 
         /* About 页面中间偏左的正文
@@ -813,7 +969,7 @@
         .aboutme-text {
             position: absolute;
             left: 8%;
-            top: 20%;
+            top: 18%;
             z-index: 3;
             width: min(60vw, 760px);
             color: #D727A1;
@@ -847,12 +1003,12 @@
         .aboutme-exhibitions {
             position: absolute;
             left: 8%;
-            bottom: 12%;
+            bottom: 7%;
             z-index: 3;
             width: min(58vw, 760px);
             color: #fff;
             font-family: "Playfair Display", Georgia, serif;
-            font-size: 14px;
+            font-size: 13px;
             font-style: normal;
             line-height: 1.5;
             letter-spacing: 0;
@@ -969,13 +1125,17 @@
             /* 手机端顶部主按钮大小 */
             .page-nav > a,
             .art-nav-group,
-            .art-nav-main {
+            .art-nav-main,
+            .photo-nav-group,
+            .photo-nav-main {
                 width: 77px;
                 height: 77px;
             }
 
             .art-nav-group,
-            .art-nav-main {
+            .art-nav-main,
+            .photo-nav-group,
+            .photo-nav-main {
                 width: 77px;
                 height: 77px;
             }
@@ -985,9 +1145,40 @@
                 gap: 6px;
             }
 
+            .photo-branches {
+                top: calc(100% + 4px);
+                gap: 2px;
+            }
+
             .branch-link {
                 width: 98px;
                 height: 98px;
+            }
+
+            /* 手机端 Portrait 页面图库 */
+            .portrait-gallery {
+                width: calc(100vw - 36px);
+                margin: 132px auto 72px;
+                gap: 52px;
+            }
+
+            .portrait-group {
+                height: 390px;
+            }
+
+            .portrait-masonry {
+                grid-template-columns: repeat(24, 1fr);
+                grid-template-rows: repeat(12, 1fr);
+                gap: 8px;
+            }
+
+            .portrait-photo {
+                margin: 0;
+            }
+
+            .portrait-group-title {
+                font-size: 18px;
+                margin-bottom: 16px;
             }
 
             /* 手机端左上角标题位置和大小 */
@@ -1003,7 +1194,8 @@
             }
 
             /* 手机端 Art 分支小标题位置和大小 */
-            .art-title-sub {
+            .art-title-sub,
+            .page-title-sub {
                 margin-top: 4px;
                 font-size: 22px;
             }
@@ -1106,8 +1298,17 @@
             </div>
         </div>
 
-        <!-- Photograph 按钮：点击进入 photographs 页面 -->
-        <a class="nav-photo" href="#photographs" data-page-link="photographs"><img src="texture/photograhs_button.png" alt="Photographs"></a>
+        <!-- Photograph 按钮组：点击主按钮进 Photograph，hover 会展开三个分支 -->
+        <div class="photo-nav-group" data-photo-group>
+            <a class="photo-nav-main" href="#photographs" data-page-link="photographs"><img src="texture/photograhs_button.png" alt="Photographs"></a>
+
+            <!-- Photograph 三个分支按钮：从上到下对应 photographs-1 到 photographs-3 -->
+            <div class="photo-branches">
+                <a class="branch-link" href="#photographs-1" data-page-link="photographs-1"><img src="texture/photo_1.png" alt="Photograph branch 1"></a>
+                <a class="branch-link" href="#photographs-2" data-page-link="photographs-2"><img src="texture/photo_2.png" alt="Photograph branch 2"></a>
+                <a class="branch-link" href="#photographs-3" data-page-link="photographs-3"><img src="texture/photo_3.png" alt="Photograph branch 3"></a>
+            </div>
+        </div>
 
         <!-- Contact 按钮：点击进入 contact 页面 -->
         <a class="nav-contact" href="#contact" data-page-link="contact"><img src="texture/contact_button.png" alt="Contact"></a>
@@ -1144,9 +1345,9 @@
 
             <!-- About 页面中间偏左的个人简介文字 -->
             <div class="aboutme-text">
-                <p><strong>Lynette Zhang</strong> is a visual artist and educator based in Ontario, Canada. She works across sculpture, painting, and mixed media, with a practice rooted in visual documentation, observation-based approaches, and material exploration.</p>
-                <p>She holds a Bachelor of Fine Arts (Honours) from Queen&rsquo;s University and is currently completing Concurrent Education. Her work moves between studio-based making and educational contexts, where processes of learning, research, and making inform one another.</p>
-                <p>Through attention to everyday observation and visual experience, her practice considers how encounters with the surrounding environment can be translated through form, surface, and material transformation.</p>
+                <p><strong>Lynette Zhang</strong> is a visual artist and educator based in Ontario, Canada. She works across sculpture, painting, and mixed media, with a practice rooted in observation, visual documentation, and material exploration.</p>
+                <p>She holds a Bachelor of Fine Arts (Hons) from Queen&rsquo;s University and is currently completing Concurrent Education. Her work moves between studio-based making and educational contexts, where processes of learning, research, and making inform one another.</p>
+                <p>Driven by curiosity, Lynette draws inspiration from everyday encounters, animal companionship, photography, travel, and collected objects. She is particularly interested in the overlooked, the unexpected, and the visually intriguing details that shape daily experience. Through attentive observation and experimentation, her practice explores how these moments can be translated through form, surface, and material transformation.</p>
             </div>
 
             <!-- About 页面底部偏左的 Selected Exhibitions 展览列表 -->
@@ -1215,6 +1416,37 @@
             </div>
         </section>
 
+        <!-- ==================== photographs-1 分支页面 ==================== -->
+        <section class="page-panel" data-page="photographs-1">
+            <!-- Photograph 第 1 个分支左上角标题 -->
+            <div class="page-title">
+                <div class="page-title-main">Photograph</div>
+                <div class="page-title-sub">portrait</div>
+            </div>
+
+            <!-- Portrait 页面图库框架
+                 图片会由下面 JS 里的 portraitGroups 自动生成到这里 -->
+            <div class="portrait-gallery" data-portrait-gallery></div>
+        </section>
+
+        <!-- ==================== photographs-2 分支页面 ==================== -->
+        <section class="page-panel" data-page="photographs-2">
+            <!-- Photograph 第 2 个分支左上角标题 -->
+            <div class="page-title">
+                <div class="page-title-main">Photograph</div>
+                <div class="page-title-sub">animals</div>
+            </div>
+        </section>
+
+        <!-- ==================== photographs-3 分支页面 ==================== -->
+        <section class="page-panel" data-page="photographs-3">
+            <!-- Photograph 第 3 个分支左上角标题 -->
+            <div class="page-title">
+                <div class="page-title-main">Photograph</div>
+                <div class="page-title-sub">environment</div>
+            </div>
+        </section>
+
         <!-- ==================== contact 页面 ==================== -->
         <section class="page-panel" data-page="contact">
             <!-- Contact 页面中间图片 contact_bg1.png -->
@@ -1223,6 +1455,12 @@
             </div>
         </section>
     </main>
+
+    <!-- Portrait 图片悬浮预览：鼠标放到 portrait 小图上时显示完整图片 -->
+    <div class="image-hover-preview" data-image-hover-preview aria-hidden="true">
+        <img src="" alt="">
+    </div>
+
     <script>
         // 自定义鼠标逻辑：让图片鼠标跟着真实鼠标移动
         (() => {
@@ -1265,6 +1503,43 @@
             document.addEventListener("mouseover", (event) => {
                 setHoverState(event.target);
             });
+        })();
+
+        // Portrait 图片悬浮预览：
+        // 鼠标放到 .portrait-photo 上，屏幕中间显示固定大小的完整图片
+        (() => {
+            const preview = document.querySelector("[data-image-hover-preview]");
+            const previewImage = preview ? preview.querySelector("img") : null;
+            if (!preview || !previewImage || window.matchMedia("(pointer: coarse)").matches) {
+                return;
+            }
+
+            const showPreview = (image) => {
+                previewImage.src = image.currentSrc || image.src;
+                previewImage.alt = image.alt || "";
+                preview.classList.add("is-visible");
+            };
+
+            const hidePreview = () => {
+                preview.classList.remove("is-visible");
+            };
+
+            document.addEventListener("mouseover", (event) => {
+                const image = event.target.closest(".portrait-photo");
+                if (image) {
+                    showPreview(image);
+                }
+            });
+
+            document.addEventListener("mouseout", (event) => {
+                const image = event.target.closest(".portrait-photo");
+                if (image && !image.contains(event.relatedTarget)) {
+                    hidePreview();
+                }
+            });
+
+            window.addEventListener("hashchange", hidePreview);
+            window.addEventListener("scroll", hidePreview, true);
         })();
 
         // 首页签名黄色星星闪光：自动读取 signature.png 里的黄色像素，只在黄色区域闪
@@ -1479,13 +1754,297 @@
             }
         })();
 
+        // Portrait 页面图库框架
+        // 以后照片命名建议：portrait_group1_1.jpg / portrait_group1_2.jpg / portrait_group2_1.jpg ...
+        // 只需要把文件名放进下面 portraitGroups 里，就会自动按组生成 masonry 图片布局。
+        (() => {
+            const portraitGroups = [
+                {
+                    title: "",
+                    images: [
+                        "portrait_group1_1.jpg",
+                        "portrait_group1_2.jpg",
+                        "portrait_group1_3.jpg",
+                        "portrait_group1_4.jpg",
+                        "portrait_group1_5.jpg",
+                        "portrait_group1_6.jpg",
+                        "portrait_group1_7.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group2_1.jpg",
+                        "portrait_group2_2.jpg",
+                        "portrait_group2_3.jpg",
+                        "portrait_group2_4.jpg",
+                        "portrait_group2_5.jpg",
+                        "portrait_group2_6.jpg",
+                        "portrait_group2_7.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group3_1.jpg",
+                        "portrait_group3_2.jpg",
+                        "portrait_group3_3.jpg",
+                        "portrait_group3_4.jpg",
+                        "portrait_group3_5.jpg",
+                        "portrait_group3_6.jpg",
+                        "portrait_group3_7.jpg",
+                        "portrait_group3_8.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group4_1.jpg",
+                        "portrait_group4_2.jpg",
+                        "portrait_group4_3.jpg",
+                        "portrait_group4_4.jpg",
+                        "portrait_group4_5.jpg",
+                        "portrait_group4_6.jpg",
+                        "portrait_group4_7.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group5_1.jpg",
+                        "portrait_group5_2.jpg",
+                        "portrait_group5_3.jpg",
+                        "portrait_group5_4.jpg",
+                        "portrait_group5_5.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group6_1.jpg",
+                        "portrait_group6_2.jpg",
+                        "portrait_group6_3.jpg",
+                        "portrait_group6_4.jpg",
+                        "portrait_group6_5.jpg",
+                        "portrait_group6_6.jpg",
+                        "portrait_group6_7.jpg",
+                        "portrait_group6_8.jpg",
+                        "portrait_group6_9.jpg",
+                        "portrait_group6_10.jpg",
+                        "portrait_group6_11.jpg",
+                        "portrait_group6_12.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group7_1.jpg",
+                        "portrait_group7_2.jpg",
+                        "portrait_group7_3.jpg",
+                        "portrait_group7_4.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group8_1.jpg",
+                        "portrait_group8_2.jpg",
+                        "portrait_group8_3.jpg",
+                        "portrait_group8_4.jpg",
+                        "portrait_group8_5.jpg",
+                        "portrait_group8_6.jpg",
+                        "portrait_group8_7.jpg",
+                        "portrait_group8_8.jpg",
+                        "portrait_group8_9.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group9_1.jpg",
+                        "portrait_group9_2.jpg",
+                        "portrait_group9_3.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group10_1.jpg",
+                        "portrait_group10_2.jpg",
+                        "portrait_group10_3.jpg",
+                        "portrait_group10_4.jpg",
+                        "portrait_group10_5.jpg",
+                        "portrait_group10_6.jpg",
+                        "portrait_group10_7.jpg"
+                    ]
+                }
+            ];
+
+            const gallery = document.querySelector("[data-portrait-gallery]");
+            if (!gallery) {
+                return;
+            }
+
+            const imagePath = (fileName) => {
+                if (fileName.includes("/") || fileName.includes("\\")) {
+                    return fileName;
+                }
+
+                return "texture/" + fileName;
+            };
+
+            // Portrait 固定画布模板：
+            // 每组都是 12 x 12 网格，图片会裁剪填满格子
+            // 如果以后某一组想单独改排版，就改这里对应数量的 column / row
+            const portraitGridPattern = (count) => {
+                const patterns = {
+                    3: [
+                        { column: "1 / 9", row: "1 / 13" },
+                        { column: "9 / 17", row: "1 / 13" },
+                        { column: "17 / 25", row: "1 / 13" }
+                    ],
+                    4: [
+                        { column: "1 / 7", row: "1 / 13" },
+                        { column: "7 / 13", row: "1 / 13" },
+                        { column: "13 / 19", row: "1 / 13" },
+                        { column: "19 / 25", row: "1 / 13" }
+                    ],
+                    5: [
+                        { column: "1 / 6", row: "1 / 13" },
+                        { column: "6 / 11", row: "1 / 13" },
+                        { column: "11 / 16", row: "1 / 13" },
+                        { column: "16 / 21", row: "1 / 13" },
+                        { column: "21 / 25", row: "1 / 13" }
+                    ],
+                    6: [
+                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "5 / 9", row: "1 / 13" },
+                        { column: "9 / 13", row: "1 / 13" },
+                        { column: "13 / 17", row: "1 / 13" },
+                        { column: "17 / 21", row: "1 / 13" },
+                        { column: "21 / 25", row: "1 / 13" }
+                    ],
+                    7: [
+                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "5 / 9", row: "1 / 13" },
+                        { column: "9 / 13", row: "1 / 13" },
+                        { column: "13 / 17", row: "1 / 13" },
+                        { column: "17 / 21", row: "1 / 7" },
+                        { column: "17 / 21", row: "7 / 13" },
+                        { column: "21 / 25", row: "1 / 13" }
+                    ],
+                    8: [
+                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "5 / 9", row: "1 / 13" },
+                        { column: "9 / 13", row: "1 / 13" },
+                        { column: "13 / 17", row: "1 / 7" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "1 / 7" },
+                        { column: "17 / 21", row: "7 / 13" },
+                        { column: "21 / 25", row: "1 / 13" }
+                    ],
+                    9: [
+                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "5 / 9", row: "1 / 13" },
+                        { column: "9 / 13", row: "1 / 13" },
+                        { column: "13 / 17", row: "1 / 7" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "1 / 7" },
+                        { column: "17 / 21", row: "7 / 13" },
+                        { column: "21 / 25", row: "1 / 7" },
+                        { column: "21 / 25", row: "7 / 13" }
+                    ],
+                    10: [
+                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "5 / 9", row: "1 / 13" },
+                        { column: "9 / 13", row: "1 / 7" },
+                        { column: "9 / 13", row: "7 / 13" },
+                        { column: "13 / 17", row: "1 / 7" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "1 / 7" },
+                        { column: "17 / 21", row: "7 / 13" },
+                        { column: "21 / 25", row: "1 / 7" },
+                        { column: "21 / 25", row: "7 / 13" }
+                    ],
+                    11: [
+                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "5 / 9", row: "1 / 7" },
+                        { column: "5 / 9", row: "7 / 13" },
+                        { column: "9 / 13", row: "1 / 7" },
+                        { column: "9 / 13", row: "7 / 13" },
+                        { column: "13 / 17", row: "1 / 7" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "1 / 7" },
+                        { column: "17 / 21", row: "7 / 13" },
+                        { column: "21 / 25", row: "1 / 7" },
+                        { column: "21 / 25", row: "7 / 13" }
+                    ],
+                    12: [
+                        { column: "1 / 5", row: "1 / 7" },
+                        { column: "1 / 5", row: "7 / 13" },
+                        { column: "5 / 9", row: "1 / 7" },
+                        { column: "5 / 9", row: "7 / 13" },
+                        { column: "9 / 13", row: "1 / 7" },
+                        { column: "9 / 13", row: "7 / 13" },
+                        { column: "13 / 17", row: "1 / 7" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "1 / 7" },
+                        { column: "17 / 21", row: "7 / 13" },
+                        { column: "21 / 25", row: "1 / 7" },
+                        { column: "21 / 25", row: "7 / 13" }
+                    ]
+                };
+
+                return patterns[count] || patterns[12].slice(0, count);
+            };
+
+            portraitGroups.forEach((group, groupIndex) => {
+                const section = document.createElement("section");
+                section.className = "portrait-group";
+                section.dataset.group = String(groupIndex + 1);
+                section.dataset.count = String(group.images.length);
+
+                if (group.title) {
+                    const title = document.createElement("h2");
+                    title.className = "portrait-group-title";
+                    title.textContent = group.title;
+                    section.appendChild(title);
+                }
+
+                const masonry = document.createElement("div");
+                masonry.className = "portrait-masonry";
+                masonry.dataset.count = String(group.images.length);
+                const gridPattern = portraitGridPattern(group.images.length);
+
+                section.appendChild(masonry);
+                gallery.appendChild(section);
+
+                group.images.forEach((fileName, imageIndex) => {
+                    const img = document.createElement("img");
+                    img.className = "portrait-photo";
+                    img.src = imagePath(fileName);
+                    img.alt = group.title ? group.title + " portrait " + (imageIndex + 1) : "Portrait " + (imageIndex + 1);
+                    img.loading = "lazy";
+                    img.decoding = "async";
+                    if (gridPattern[imageIndex]) {
+                        img.style.gridColumn = gridPattern[imageIndex].column;
+                        img.style.gridRow = gridPattern[imageIndex].row;
+                    }
+                    masonry.appendChild(img);
+                });
+
+            });
+        })();
+
         // 单页切换逻辑：通过地址栏里的 #hash 切换五个页面状态
         (() => {
-            const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "contact"];
+            const pageNames = ["index", "aboutme", "artworks", "artworks-1", "artworks-2", "artworks-3", "artworks-4", "photographs", "photographs-1", "photographs-2", "photographs-3", "contact"];
             const panels = Array.from(document.querySelectorAll("[data-page]"));
             const links = Array.from(document.querySelectorAll("[data-page-link]"));
             const artGroup = document.querySelector("[data-art-group]");
             const artLinks = artGroup ? Array.from(artGroup.querySelectorAll("a")) : [];
+            const photoGroup = document.querySelector("[data-photo-group]");
+            const photoLinks = photoGroup ? Array.from(photoGroup.querySelectorAll("a")) : [];
             const music = document.querySelector("[data-site-music]");
             const musicToggle = document.querySelector("[data-music-toggle]");
             const musicPages = ["index", "aboutme"];
@@ -1541,6 +2100,7 @@
                 document.documentElement.dataset.page = activePage;
                 document.body.classList.toggle("subpage-active", activePage !== "index");
                 document.body.classList.toggle("art-page-active", activePage.startsWith("artworks"));
+                document.body.classList.toggle("photo-page-active", activePage.startsWith("photographs"));
                 if (document.activeElement instanceof HTMLElement) {
                     document.activeElement.blur();
                 }
@@ -1550,12 +2110,17 @@
                 links.forEach((link) => {
                     if (link.dataset.pageLink === "artworks") {
                         link.classList.toggle("is-active", activePage.startsWith("artworks"));
+                    } else if (link.dataset.pageLink === "photographs") {
+                        link.classList.toggle("is-active", activePage.startsWith("photographs"));
                     } else {
                         link.classList.toggle("is-active", link.dataset.pageLink === activePage);
                     }
                 });
                 if (artGroup) {
                     artGroup.classList.toggle("is-current", activePage.startsWith("artworks"));
+                }
+                if (photoGroup) {
+                    photoGroup.classList.toggle("is-current", activePage.startsWith("photographs"));
                 }
                 if (musicPages.includes(activePage)) {
                     resumeMusic();
@@ -1608,6 +2173,24 @@
 
                 artGroup.addEventListener("mouseleave", () => {
                     artGroup.classList.remove("branches-locked");
+                });
+            }
+
+            if (photoGroup) {
+                photoLinks.forEach((link) => {
+                    link.addEventListener("click", (event) => {
+                        photoGroup.classList.add("branches-locked");
+                        const clicked = event.currentTarget;
+                        requestAnimationFrame(() => {
+                            if (clicked instanceof HTMLElement) {
+                                clicked.blur();
+                            }
+                        });
+                    });
+                });
+
+                photoGroup.addEventListener("mouseleave", () => {
+                    photoGroup.classList.remove("branches-locked");
                 });
             }
 
