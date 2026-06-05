@@ -896,10 +896,9 @@
 
         /* Portrait 每一个组
            每个 group 是一组图片
-           height：每个 group 可以不同，由 JS 里的 bento 设置控制 */
+           高度由里面图片的原始比例自然撑开，不强行固定 */
         .portrait-group {
             width: 100%;
-            height: var(--portrait-group-height, 600px);
         }
 
         /* Portrait 组标题，可选
@@ -914,31 +913,29 @@
             letter-spacing: 0;
         }
 
-        /* Portrait Bento Grid
-           每个 group 都是 24 x 12 的网格
-           每组可以有不同高度和不同大小的格子
-           gap：组内照片之间的缝隙，所有组统一 */
+        /* Portrait 原比例 masonry / bento 风格排版
+           column-count：控制一组里面分几列
+           column-gap：组内照片左右间距，所有组统一
+           图片高度会按原图比例自然显示，不拉伸、不变方 */
         .portrait-masonry {
             width: 100%;
-            height: 100%;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(24, 1fr);
-            grid-template-rows: repeat(12, 1fr);
-            gap: var(--portrait-tile-gap, 18px);
-            overflow: hidden;
+            column-count: var(--portrait-columns, 4);
+            column-gap: var(--portrait-tile-gap, 18px);
         }
 
         /* Portrait 每张照片
-           object-fit: cover 表示图片会裁剪一点来填满格子
-           现在允许裁剪，所以画面会更满
+           width: 100% + height: auto 保留你图片本来的长宽比例
+           margin-bottom：组内照片上下间距，所有照片统一
            loading="lazy" 会让图片滚到附近才加载 */
         .portrait-photo {
             display: block;
             width: 100%;
-            height: 100%;
-            margin: 0;
-            object-fit: cover;
+            height: auto;
+            margin: 0 0 var(--portrait-tile-gap, 18px);
+            break-inside: avoid;
+            page-break-inside: avoid;
+            object-fit: contain;
             object-position: center;
         }
 
@@ -1181,18 +1178,13 @@
                 gap: 52px;
             }
 
-            .portrait-group {
-                height: calc(var(--portrait-group-height, 600px) * 0.72);
-            }
-
             .portrait-masonry {
-                grid-template-columns: repeat(24, 1fr);
-                grid-template-rows: repeat(12, 1fr);
-                gap: 8px;
+                column-count: 2;
+                column-gap: 8px;
             }
 
             .portrait-photo {
-                margin: 0;
+                margin: 0 0 8px;
             }
 
             .portrait-group-title {
@@ -1910,143 +1902,19 @@
                 return "texture/" + fileName;
             };
 
-            // Portrait Bento Grid 设置：
-            // height：这一组自己的高度，组大小可以不同
-            // cells：每张图在 24 x 12 网格里占的位置
-            // 所有组之间的上下间距由 CSS 的 .portrait-gallery gap 统一控制
-            const portraitBentoLayout = (count) => {
-                const layouts = {
-                    3: {
-                        height: 360,
-                        cells: [
-                            { column: "2 / 9", row: "1 / 13" },
-                            { column: "9 / 16", row: "1 / 13" },
-                            { column: "16 / 23", row: "1 / 13" }
-                        ]
-                    },
-                    4: {
-                        height: 420,
-                        cells: [
-                            { column: "2 / 8", row: "1 / 13" },
-                            { column: "8 / 13", row: "2 / 12" },
-                            { column: "13 / 18", row: "2 / 12" },
-                            { column: "18 / 24", row: "1 / 13" }
-                        ]
-                    },
-                    5: {
-                        height: 460,
-                        cells: [
-                            { column: "1 / 6", row: "1 / 13" },
-                            { column: "6 / 11", row: "2 / 12" },
-                            { column: "11 / 16", row: "1 / 13" },
-                            { column: "16 / 21", row: "2 / 12" },
-                            { column: "21 / 25", row: "1 / 13" }
-                        ]
-                    },
-                    6: {
-                        height: 480,
-                        cells: [
-                            { column: "1 / 5", row: "1 / 13" },
-                            { column: "5 / 9", row: "2 / 12" },
-                            { column: "9 / 13", row: "1 / 13" },
-                            { column: "13 / 17", row: "2 / 12" },
-                            { column: "17 / 21", row: "1 / 13" },
-                            { column: "21 / 25", row: "2 / 12" }
-                        ]
-                    },
-                    7: {
-                        height: 560,
-                        cells: [
-                            { column: "1 / 7", row: "1 / 7" },
-                            { column: "7 / 12", row: "1 / 7" },
-                            { column: "12 / 17", row: "1 / 7" },
-                            { column: "17 / 23", row: "1 / 7" },
-                            { column: "4 / 10", row: "7 / 13" },
-                            { column: "10 / 16", row: "7 / 13" },
-                            { column: "16 / 22", row: "7 / 13" }
-                        ]
-                    },
-                    8: {
-                        height: 560,
-                        cells: [
-                            { column: "1 / 7", row: "1 / 7" },
-                            { column: "7 / 13", row: "1 / 7" },
-                            { column: "13 / 19", row: "1 / 7" },
-                            { column: "19 / 25", row: "1 / 7" },
-                            { column: "1 / 7", row: "7 / 13" },
-                            { column: "7 / 13", row: "7 / 13" },
-                            { column: "13 / 19", row: "7 / 13" },
-                            { column: "19 / 25", row: "7 / 13" }
-                        ]
-                    },
-                    9: {
-                        height: 620,
-                        cells: [
-                            { column: "1 / 6", row: "1 / 7" },
-                            { column: "6 / 11", row: "1 / 7" },
-                            { column: "11 / 16", row: "1 / 7" },
-                            { column: "16 / 21", row: "1 / 7" },
-                            { column: "21 / 25", row: "1 / 7" },
-                            { column: "3 / 8", row: "7 / 13" },
-                            { column: "8 / 13", row: "7 / 13" },
-                            { column: "13 / 18", row: "7 / 13" },
-                            { column: "18 / 23", row: "7 / 13" }
-                        ]
-                    },
-                    10: {
-                        height: 620,
-                        cells: [
-                            { column: "1 / 6", row: "1 / 7" },
-                            { column: "6 / 11", row: "1 / 7" },
-                            { column: "11 / 16", row: "1 / 7" },
-                            { column: "16 / 21", row: "1 / 7" },
-                            { column: "21 / 25", row: "1 / 7" },
-                            { column: "1 / 6", row: "7 / 13" },
-                            { column: "6 / 11", row: "7 / 13" },
-                            { column: "11 / 16", row: "7 / 13" },
-                            { column: "16 / 21", row: "7 / 13" },
-                            { column: "21 / 25", row: "7 / 13" }
-                        ]
-                    },
-                    11: {
-                        height: 660,
-                        cells: [
-                            { column: "1 / 5", row: "1 / 7" },
-                            { column: "5 / 9", row: "1 / 7" },
-                            { column: "9 / 13", row: "1 / 7" },
-                            { column: "13 / 17", row: "1 / 7" },
-                            { column: "17 / 21", row: "1 / 7" },
-                            { column: "21 / 25", row: "1 / 7" },
-                            { column: "3 / 8", row: "7 / 13" },
-                            { column: "8 / 13", row: "7 / 13" },
-                            { column: "13 / 18", row: "7 / 13" },
-                            { column: "18 / 23", row: "7 / 13" },
-                            { column: "1 / 3", row: "7 / 13" }
-                        ]
-                    },
-                    12: {
-                        height: 660,
-                        cells: [
-                            { column: "1 / 5", row: "1 / 7" },
-                            { column: "5 / 9", row: "1 / 7" },
-                            { column: "9 / 13", row: "1 / 7" },
-                            { column: "13 / 17", row: "1 / 7" },
-                            { column: "17 / 21", row: "1 / 7" },
-                            { column: "21 / 25", row: "1 / 7" },
-                            { column: "1 / 5", row: "7 / 13" },
-                            { column: "5 / 9", row: "7 / 13" },
-                            { column: "9 / 13", row: "7 / 13" },
-                            { column: "13 / 17", row: "7 / 13" },
-                            { column: "17 / 21", row: "7 / 13" },
-                            { column: "21 / 25", row: "7 / 13" }
-                        ]
-                    }
-                };
+            // Portrait 原比例 masonry 设置：
+            // 这里只控制每组列数，不控制图片高度
+            // 图片高度由原始长宽比自动决定
+            const portraitColumnCount = (count) => {
+                if (count <= 3) {
+                    return 3;
+                }
 
-                return layouts[count] || {
-                    height: 660,
-                    cells: layouts[12].cells.slice(0, count)
-                };
+                if (count <= 6) {
+                    return 4;
+                }
+
+                return 5;
             };
 
             portraitGroups.forEach((group, groupIndex) => {
@@ -2065,9 +1933,7 @@
                 const masonry = document.createElement("div");
                 masonry.className = "portrait-masonry";
                 masonry.dataset.count = String(group.images.length);
-                const bentoLayout = portraitBentoLayout(group.images.length);
-                const gridPattern = bentoLayout.cells;
-                section.style.setProperty("--portrait-group-height", bentoLayout.height + "px");
+                masonry.style.setProperty("--portrait-columns", portraitColumnCount(group.images.length));
 
                 section.appendChild(masonry);
                 gallery.appendChild(section);
@@ -2079,10 +1945,6 @@
                     img.alt = group.title ? group.title + " portrait " + (imageIndex + 1) : "Portrait " + (imageIndex + 1);
                     img.loading = "lazy";
                     img.decoding = "async";
-                    if (gridPattern[imageIndex]) {
-                        img.style.gridColumn = gridPattern[imageIndex].column;
-                        img.style.gridRow = gridPattern[imageIndex].row;
-                    }
                     masonry.appendChild(img);
                 });
 
