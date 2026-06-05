@@ -419,7 +419,7 @@
             z-index: 12;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0;
             opacity: 0;
             pointer-events: none;
             transform: translateX(-50%) scale(0.96);
@@ -429,7 +429,7 @@
         /* Photo 三个分支按钮间距
            gap：数值越小，三个分支上下越靠近 */
         .photo-branches {
-            gap: 3px;
+            gap: 0;
         }
 
         /* 这个透明连接带专门用来防止鼠标从 Art 主按钮滑向分支时断开 hover */
@@ -481,19 +481,21 @@
         }
 
         /* 分支图片按钮
-           width / height：分支图片大小 */
+           width：分支图片宽度
+           height: auto 表示高度跟着图片真实比例走，这样上下不会有假空隙 */
         .branch-link {
             position: relative;
             display: block;
             width: 116px;
-            height: 116px;
+            height: auto;
+            line-height: 0;
             transition: transform 0.18s ease, filter 0.18s ease;
         }
 
         .branch-link img {
             display: block;
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: contain;
             pointer-events: none;
         }
@@ -853,6 +855,11 @@
             color: #d0c2ff;
         }
 
+        /* Portrait 分支左上角标题颜色 */
+        .page-panel[data-page="photographs-1"] .page-title {
+            color: #b815b6;
+        }
+
         /* Portrait 页面：photographs-1 分支
            这是用来放人物肖像很多照片的页面
            background-color：页面纯白背景
@@ -885,7 +892,7 @@
            height：每个 group 固定一样高，所以组间距不会忽大忽小 */
         .portrait-group {
             width: 100%;
-            height: var(--portrait-group-height, 470px);
+            height: var(--portrait-group-height, 600px);
         }
 
         /* Portrait 组标题，可选
@@ -911,7 +918,7 @@
             display: grid;
             grid-template-columns: repeat(24, 1fr);
             grid-template-rows: repeat(12, 1fr);
-            gap: 16px;
+            gap: 18px;
             overflow: hidden;
         }
 
@@ -974,7 +981,7 @@
             width: min(60vw, 760px);
             color: #D727A1;
             font-family: "Playfair Display", Georgia, serif;
-            font-size: 19px;
+            font-size: 18px;
             font-style: normal;
             line-height: 1.58;
             letter-spacing: 0;
@@ -1003,7 +1010,7 @@
         .aboutme-exhibitions {
             position: absolute;
             left: 8%;
-            bottom: 7%;
+            bottom: 9%;
             z-index: 3;
             width: min(58vw, 760px);
             color: #fff;
@@ -1142,17 +1149,17 @@
 
             .art-branches {
                 top: calc(100% + 4px);
-                gap: 6px;
+                gap: 0;
             }
 
             .photo-branches {
                 top: calc(100% + 4px);
-                gap: 2px;
+                gap: 0;
             }
 
             .branch-link {
                 width: 98px;
-                height: 98px;
+                height: auto;
             }
 
             /* 手机端 Portrait 页面图库 */
@@ -1899,98 +1906,98 @@
             const portraitGridPattern = (count) => {
                 const patterns = {
                     3: [
-                        { column: "1 / 9", row: "1 / 13" },
-                        { column: "9 / 17", row: "1 / 13" },
-                        { column: "17 / 25", row: "1 / 13" }
+                        { column: "3 / 9", row: "2 / 12" },
+                        { column: "10 / 16", row: "2 / 12" },
+                        { column: "17 / 23", row: "2 / 12" }
                     ],
                     4: [
-                        { column: "1 / 7", row: "1 / 13" },
-                        { column: "7 / 13", row: "1 / 13" },
-                        { column: "13 / 19", row: "1 / 13" },
-                        { column: "19 / 25", row: "1 / 13" }
+                        { column: "2 / 7", row: "3 / 11" },
+                        { column: "7 / 12", row: "3 / 11" },
+                        { column: "13 / 18", row: "3 / 11" },
+                        { column: "18 / 23", row: "3 / 11" }
                     ],
                     5: [
-                        { column: "1 / 6", row: "1 / 13" },
-                        { column: "6 / 11", row: "1 / 13" },
-                        { column: "11 / 16", row: "1 / 13" },
-                        { column: "16 / 21", row: "1 / 13" },
-                        { column: "21 / 25", row: "1 / 13" }
+                        { column: "2 / 6", row: "3 / 11" },
+                        { column: "6 / 10", row: "3 / 11" },
+                        { column: "10 / 14", row: "3 / 11" },
+                        { column: "14 / 18", row: "3 / 11" },
+                        { column: "18 / 22", row: "3 / 11" }
                     ],
                     6: [
-                        { column: "1 / 5", row: "1 / 13" },
-                        { column: "5 / 9", row: "1 / 13" },
-                        { column: "9 / 13", row: "1 / 13" },
-                        { column: "13 / 17", row: "1 / 13" },
-                        { column: "17 / 21", row: "1 / 13" },
-                        { column: "21 / 25", row: "1 / 13" }
+                        { column: "1 / 5", row: "3 / 11" },
+                        { column: "5 / 9", row: "3 / 11" },
+                        { column: "9 / 13", row: "3 / 11" },
+                        { column: "13 / 17", row: "3 / 11" },
+                        { column: "17 / 21", row: "3 / 11" },
+                        { column: "21 / 25", row: "3 / 11" }
                     ],
                     7: [
-                        { column: "1 / 5", row: "1 / 13" },
-                        { column: "5 / 9", row: "1 / 13" },
-                        { column: "9 / 13", row: "1 / 13" },
-                        { column: "13 / 17", row: "1 / 13" },
-                        { column: "17 / 21", row: "1 / 7" },
-                        { column: "17 / 21", row: "7 / 13" },
-                        { column: "21 / 25", row: "1 / 13" }
+                        { column: "4 / 8", row: "1 / 7" },
+                        { column: "8 / 12", row: "1 / 7" },
+                        { column: "12 / 16", row: "1 / 7" },
+                        { column: "16 / 20", row: "1 / 7" },
+                        { column: "6 / 10", row: "7 / 13" },
+                        { column: "10 / 14", row: "7 / 13" },
+                        { column: "14 / 18", row: "7 / 13" }
                     ],
                     8: [
-                        { column: "1 / 5", row: "1 / 13" },
-                        { column: "5 / 9", row: "1 / 13" },
-                        { column: "9 / 13", row: "1 / 13" },
-                        { column: "13 / 17", row: "1 / 7" },
-                        { column: "13 / 17", row: "7 / 13" },
-                        { column: "17 / 21", row: "1 / 7" },
-                        { column: "17 / 21", row: "7 / 13" },
-                        { column: "21 / 25", row: "1 / 13" }
+                        { column: "4 / 8", row: "1 / 7" },
+                        { column: "8 / 12", row: "1 / 7" },
+                        { column: "12 / 16", row: "1 / 7" },
+                        { column: "16 / 20", row: "1 / 7" },
+                        { column: "4 / 8", row: "7 / 13" },
+                        { column: "8 / 12", row: "7 / 13" },
+                        { column: "12 / 16", row: "7 / 13" },
+                        { column: "16 / 20", row: "7 / 13" }
                     ],
                     9: [
-                        { column: "1 / 5", row: "1 / 13" },
-                        { column: "5 / 9", row: "1 / 13" },
-                        { column: "9 / 13", row: "1 / 13" },
+                        { column: "1 / 5", row: "1 / 7" },
+                        { column: "5 / 9", row: "1 / 7" },
+                        { column: "9 / 13", row: "1 / 7" },
                         { column: "13 / 17", row: "1 / 7" },
-                        { column: "13 / 17", row: "7 / 13" },
                         { column: "17 / 21", row: "1 / 7" },
-                        { column: "17 / 21", row: "7 / 13" },
-                        { column: "21 / 25", row: "1 / 7" },
-                        { column: "21 / 25", row: "7 / 13" }
+                        { column: "5 / 9", row: "7 / 13" },
+                        { column: "9 / 13", row: "7 / 13" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "7 / 13" }
                     ],
                     10: [
-                        { column: "1 / 5", row: "1 / 13" },
-                        { column: "5 / 9", row: "1 / 13" },
+                        { column: "1 / 5", row: "1 / 7" },
+                        { column: "5 / 9", row: "1 / 7" },
                         { column: "9 / 13", row: "1 / 7" },
-                        { column: "9 / 13", row: "7 / 13" },
                         { column: "13 / 17", row: "1 / 7" },
-                        { column: "13 / 17", row: "7 / 13" },
                         { column: "17 / 21", row: "1 / 7" },
+                        { column: "5 / 9", row: "7 / 13" },
+                        { column: "9 / 13", row: "7 / 13" },
+                        { column: "13 / 17", row: "7 / 13" },
                         { column: "17 / 21", row: "7 / 13" },
-                        { column: "21 / 25", row: "1 / 7" },
                         { column: "21 / 25", row: "7 / 13" }
                     ],
                     11: [
-                        { column: "1 / 5", row: "1 / 13" },
+                        { column: "1 / 5", row: "1 / 7" },
                         { column: "5 / 9", row: "1 / 7" },
-                        { column: "5 / 9", row: "7 / 13" },
                         { column: "9 / 13", row: "1 / 7" },
-                        { column: "9 / 13", row: "7 / 13" },
                         { column: "13 / 17", row: "1 / 7" },
-                        { column: "13 / 17", row: "7 / 13" },
                         { column: "17 / 21", row: "1 / 7" },
-                        { column: "17 / 21", row: "7 / 13" },
                         { column: "21 / 25", row: "1 / 7" },
-                        { column: "21 / 25", row: "7 / 13" }
+                        { column: "3 / 7", row: "7 / 13" },
+                        { column: "7 / 11", row: "7 / 13" },
+                        { column: "11 / 15", row: "7 / 13" },
+                        { column: "15 / 19", row: "7 / 13" },
+                        { column: "19 / 23", row: "7 / 13" }
                     ],
                     12: [
                         { column: "1 / 5", row: "1 / 7" },
-                        { column: "1 / 5", row: "7 / 13" },
                         { column: "5 / 9", row: "1 / 7" },
-                        { column: "5 / 9", row: "7 / 13" },
                         { column: "9 / 13", row: "1 / 7" },
-                        { column: "9 / 13", row: "7 / 13" },
                         { column: "13 / 17", row: "1 / 7" },
-                        { column: "13 / 17", row: "7 / 13" },
                         { column: "17 / 21", row: "1 / 7" },
-                        { column: "17 / 21", row: "7 / 13" },
                         { column: "21 / 25", row: "1 / 7" },
+                        { column: "1 / 5", row: "7 / 13" },
+                        { column: "5 / 9", row: "7 / 13" },
+                        { column: "9 / 13", row: "7 / 13" },
+                        { column: "13 / 17", row: "7 / 13" },
+                        { column: "17 / 21", row: "7 / 13" },
                         { column: "21 / 25", row: "7 / 13" }
                     ]
                 };
