@@ -877,6 +877,7 @@
             background-repeat: no-repeat;
             background-size: cover;
             overflow-y: auto;
+            overflow-x: hidden;
             overscroll-behavior: contain;
         }
 
@@ -887,55 +888,43 @@
         .portrait-gallery {
             position: relative;
             z-index: 2;
-            width: min(94vw, 1680px);
-            margin: 178px auto 120px;
+            width: min(88vw, 1280px);
+            margin: 178px 5vw 120px auto;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            align-items: start;
+            gap: var(--portrait-tile-gap, 18px);
+        }
+
+        .portrait-column {
             display: flex;
             flex-direction: column;
-            gap: var(--portrait-section-gap, 56px);
+            gap: var(--portrait-tile-gap, 18px);
         }
 
-        /* Portrait 每一个组
-           每个 group 是一组图片
-           高度由里面图片的原始比例自然撑开，不强行固定 */
-        .portrait-group {
+        /* Portrait 单张图片外框
+           竖图和横图会自动套用不同的比例框
+           图片会裁剪填满外框 */
+        .portrait-tile {
+            display: block;
             width: 100%;
+            overflow: hidden;
+            background: transparent;
         }
 
-        /* Portrait 组标题，可选
-           如果某一组以后需要名字，就在 JS 里填 title */
-        .portrait-group-title {
-            margin: 0 auto 22px;
-            width: min(100%, 980px);
-            color: #111;
-            font-family: "Playfair Display", Georgia, serif;
-            font-size: 22px;
-            font-weight: 400;
-            letter-spacing: 0;
+        .portrait-tile.is-portrait {
+            aspect-ratio: 3 / 4;
         }
 
-        /* Portrait 原比例 masonry / bento 风格排版
-           column-count：控制一组里面分几列
-           column-gap：组内照片左右间距，所有组统一
-           图片高度会按原图比例自然显示，不拉伸、不变方 */
-        .portrait-masonry {
-            width: 100%;
-            margin: 0 auto;
-            column-count: var(--portrait-columns, 4);
-            column-gap: var(--portrait-tile-gap, 18px);
+        .portrait-tile.is-landscape {
+            aspect-ratio: 4 / 3;
         }
 
-        /* Portrait 每张照片
-           width: 100% + height: auto 保留你图片本来的长宽比例
-           margin-bottom：组内照片上下间距，所有照片统一
-           loading="lazy" 会让图片滚到附近才加载 */
         .portrait-photo {
             display: block;
             width: 100%;
-            height: auto;
-            margin: 0 0 var(--portrait-tile-gap, 18px);
-            break-inside: avoid;
-            page-break-inside: avoid;
-            object-fit: contain;
+            height: 100%;
+            object-fit: cover;
             object-position: center;
         }
 
@@ -1175,21 +1164,12 @@
             .portrait-gallery {
                 width: calc(100vw - 36px);
                 margin: 132px auto 72px;
-                gap: 52px;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
             }
 
-            .portrait-masonry {
-                column-count: 2;
-                column-gap: 8px;
-            }
-
-            .portrait-photo {
-                margin: 0 0 8px;
-            }
-
-            .portrait-group-title {
-                font-size: 18px;
-                margin-bottom: 16px;
+            .portrait-column {
+                gap: 10px;
             }
 
             /* 手机端左上角标题位置和大小 */
@@ -1902,53 +1882,70 @@
                 return "texture/" + fileName;
             };
 
-            // Portrait 原比例 masonry 设置：
-            // 这里只控制每组列数，不控制图片高度
-            // 图片高度由原始长宽比自动决定
-            const portraitColumnCount = (count) => {
-                if (count <= 3) {
-                    return 3;
-                }
-
-                if (count <= 6) {
-                    return 4;
-                }
-
-                return 5;
+            // Portrait 新排版：自动判断图片横竖方向，再套用对应比例框。
+            // 竖图使用竖版框，横图使用横版框，图片会被 object-fit: cover 裁剪填满。
+            const setPortraitTileRatio = (tile, img) => {
+                const isPortrait = img.naturalHeight >= img.naturalWidth;
+                tile.classList.toggle("is-portrait", isPortrait);
+                tile.classList.toggle("is-landscape", !isPortrait);
             };
 
-            portraitGroups.forEach((group, groupIndex) => {
-                const section = document.createElement("section");
-                section.className = "portrait-group";
-                section.dataset.group = String(groupIndex + 1);
-                section.dataset.count = String(group.images.length);
+            const portraitItems = portraitGroups.flatMap((group, groupIndex) => {
+                const groupNumber = groupIndex + 1;
+                return group.images.map((fileName, imageIndex) => ({
+                    fileName,
+                    group,
+                    groupNumber,
+                    imageNumber: imageIndex + 1
+                }));
+            });
 
-                if (group.title) {
-                    const title = document.createElement("h2");
-                    title.className = "portrait-group-title";
-                    title.textContent = group.title;
-                    section.appendChild(title);
+            const getPortraitColumnCount = () => window.matchMedia("(max-width: 640px)").matches ? 2 : 4;
+            let currentPortraitColumnCount = 0;
+
+            const renderPortraitGallery = () => {
+                const columnCount = getPortraitColumnCount();
+                if (columnCount === currentPortraitColumnCount && gallery.children.length > 0) {
+                    return;
                 }
 
-                const masonry = document.createElement("div");
-                masonry.className = "portrait-masonry";
-                masonry.dataset.count = String(group.images.length);
-                masonry.style.setProperty("--portrait-columns", portraitColumnCount(group.images.length));
+                currentPortraitColumnCount = columnCount;
+                gallery.innerHTML = "";
 
-                section.appendChild(masonry);
-                gallery.appendChild(section);
-
-                group.images.forEach((fileName, imageIndex) => {
-                    const img = document.createElement("img");
-                    img.className = "portrait-photo";
-                    img.src = imagePath(fileName);
-                    img.alt = group.title ? group.title + " portrait " + (imageIndex + 1) : "Portrait " + (imageIndex + 1);
-                    img.loading = "lazy";
-                    img.decoding = "async";
-                    masonry.appendChild(img);
+                const columns = Array.from({ length: columnCount }, () => {
+                    const column = document.createElement("div");
+                    column.className = "portrait-column";
+                    gallery.appendChild(column);
+                    return column;
                 });
 
-            });
+                portraitItems.forEach((item, itemIndex) => {
+                    const tile = document.createElement("div");
+                    const img = document.createElement("img");
+
+                    tile.className = "portrait-tile is-portrait";
+                    tile.dataset.group = String(item.groupNumber);
+                    tile.dataset.image = String(item.imageNumber);
+
+                    img.className = "portrait-photo";
+                    img.src = imagePath(item.fileName);
+                    img.alt = item.group.title ? item.group.title + " portrait " + item.imageNumber : "Portrait " + item.imageNumber;
+                    img.loading = "lazy";
+                    img.decoding = "async";
+
+                    if (img.complete) {
+                        setPortraitTileRatio(tile, img);
+                    } else {
+                        img.addEventListener("load", () => setPortraitTileRatio(tile, img), { once: true });
+                    }
+
+                    tile.appendChild(img);
+                    columns[itemIndex % columnCount].appendChild(tile);
+                });
+            };
+
+            renderPortraitGallery();
+            window.addEventListener("resize", renderPortraitGallery);
         })();
 
         // 单页切换逻辑：通过地址栏里的 #hash 切换五个页面状态
