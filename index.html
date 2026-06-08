@@ -239,7 +239,8 @@
         }
 
         html[data-page="index"] .music-toggle,
-        html[data-page="aboutme"] .music-toggle {
+        html[data-page="aboutme"] .music-toggle,
+        html[data-page="photographs-1"] .music-toggle {
             display: block;
         }
 
@@ -263,6 +264,16 @@
             bottom: 622px;
             width: 72px;
             height: 60px;
+        }
+
+        /* Portrait 页面音乐按钮位置
+           left / top：控制按钮在左上角标题旁边的位置
+           width / height：控制按钮大小 */
+        html[data-page="photographs-1"] .music-toggle {
+            left: 370px;
+            top: 55px;
+            width: 70px;
+            height: 58px;
         }
 
         .music-toggle:hover {
@@ -864,7 +875,7 @@
 
         /* Portrait 分支左上角标题颜色 */
         .page-panel[data-page="photographs-1"] .page-title {
-            color: #b815b6;
+            color: #fff;
         }
 
         /* Portrait 页面：photographs-1 分支
@@ -926,6 +937,12 @@
             height: 100%;
             object-fit: cover;
             object-position: center;
+            transition: transform 0.18s ease, filter 0.18s ease;
+        }
+
+        .portrait-tile:hover .portrait-photo {
+            filter: brightness(1.08) saturate(1.04);
+            transform: scale(1.025);
         }
 
         /* Portrait 图片悬浮预览层
@@ -934,30 +951,67 @@
            object-fit: contain：完整显示，不裁剪 */
         .image-hover-preview {
             position: fixed;
-            left: 50%;
-            top: 50%;
+            inset: 0;
             z-index: 80;
-            width: min(58vw, 620px);
-            height: min(74vh, 720px);
-            transform: translate(-50%, -50%) scale(0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: min(5vw, 72px);
+            background: rgba(0, 0, 0, 0.62);
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.14s ease, transform 0.14s ease, visibility 0.14s ease;
+            transition: opacity 0.16s ease, visibility 0.16s ease;
         }
 
         .image-hover-preview.is-visible {
             opacity: 1;
             visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+
+        .image-preview-close {
+            position: absolute;
+            top: 28px;
+            right: 32px;
+            z-index: 2;
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 34px;
+            line-height: 40px;
+            text-align: center;
+            padding: 0;
+            transition: transform 0.16s ease, background 0.16s ease;
+        }
+
+        .image-preview-close:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: scale(1.08);
+        }
+
+        .image-preview-close:active {
+            transform: scale(0.94);
         }
 
         .image-hover-preview img {
             display: block;
-            width: 100%;
-            height: 100%;
+            width: auto;
+            height: auto;
+            max-width: min(92vw, 1500px);
+            max-height: 90vh;
             object-fit: contain;
             object-position: center;
+            transform: scale(0.98);
+            transition: transform 0.16s ease;
+        }
+
+        .image-hover-preview.is-visible img {
+            transform: scale(1);
         }
 
         /* About 页面中间偏左的正文
@@ -1449,6 +1503,7 @@
 
     <!-- Portrait 图片悬浮预览：鼠标放到 portrait 小图上时显示完整图片 -->
     <div class="image-hover-preview" data-image-hover-preview aria-hidden="true">
+        <button class="image-preview-close" type="button" data-image-preview-close aria-label="Close image">x</button>
         <img src="" alt="">
     </div>
 
@@ -1456,7 +1511,7 @@
         // 自定义鼠标逻辑：让图片鼠标跟着真实鼠标移动
         (() => {
             const cursor = document.querySelector(".custom-cursor");
-            const interactiveSelector = "a, button, [role='button'], input, textarea, select, label";
+            const interactiveSelector = "a, button, [role='button'], input, textarea, select, label, .portrait-photo, .image-hover-preview";
             if (!cursor || window.matchMedia("(pointer: coarse)").matches) {
                 return;
             }
@@ -1496,41 +1551,53 @@
             });
         })();
 
-        // Portrait 图片悬浮预览：
-        // 鼠标放到 .portrait-photo 上，屏幕中间显示固定大小的完整图片
+        // Portrait 图片点击放大：
+        // 点击 .portrait-photo 后，屏幕中间显示大图；点击半透明背景或按 Esc 关闭。
         (() => {
             const preview = document.querySelector("[data-image-hover-preview]");
             const previewImage = preview ? preview.querySelector("img") : null;
-            if (!preview || !previewImage || window.matchMedia("(pointer: coarse)").matches) {
+            const closeButton = preview ? preview.querySelector("[data-image-preview-close]") : null;
+            if (!preview || !previewImage) {
                 return;
             }
 
-            const showPreview = (image) => {
+            const openPreview = (image) => {
                 previewImage.src = image.currentSrc || image.src;
                 previewImage.alt = image.alt || "";
                 preview.classList.add("is-visible");
+                preview.setAttribute("aria-hidden", "false");
             };
 
-            const hidePreview = () => {
+            const closePreview = () => {
                 preview.classList.remove("is-visible");
+                preview.setAttribute("aria-hidden", "true");
             };
 
-            document.addEventListener("mouseover", (event) => {
+            document.addEventListener("click", (event) => {
                 const image = event.target.closest(".portrait-photo");
                 if (image) {
-                    showPreview(image);
+                    event.preventDefault();
+                    openPreview(image);
                 }
             });
 
-            document.addEventListener("mouseout", (event) => {
-                const image = event.target.closest(".portrait-photo");
-                if (image && !image.contains(event.relatedTarget)) {
-                    hidePreview();
+            preview.addEventListener("click", (event) => {
+                if (event.target === preview) {
+                    closePreview();
                 }
             });
 
-            window.addEventListener("hashchange", hidePreview);
-            window.addEventListener("scroll", hidePreview, true);
+            if (closeButton) {
+                closeButton.addEventListener("click", closePreview);
+            }
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    closePreview();
+                }
+            });
+
+            window.addEventListener("hashchange", closePreview);
         })();
 
         // 首页签名黄色星星闪光：自动读取 signature.png 里的黄色像素，只在黄色区域闪
@@ -1960,7 +2027,7 @@
             const photoLinks = photoGroup ? Array.from(photoGroup.querySelectorAll("a")) : [];
             const music = document.querySelector("[data-site-music]");
             const musicToggle = document.querySelector("[data-music-toggle]");
-            const musicPages = ["index", "aboutme"];
+            const musicPages = ["index", "aboutme", "photographs-1"];
             let musicShouldPlay = false;
 
             // 同步音乐按钮状态：播放时按钮稍微变暗放大
