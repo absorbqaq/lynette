@@ -239,8 +239,7 @@
         }
 
         html[data-page="index"] .music-toggle,
-        html[data-page="aboutme"] .music-toggle,
-        html[data-page="photographs-1"] .music-toggle {
+        html[data-page="aboutme"] .music-toggle {
             display: block;
         }
 
@@ -269,7 +268,9 @@
         /* Portrait 页面音乐按钮位置
            left / top：控制按钮在左上角标题旁边的位置
            width / height：控制按钮大小 */
-        html[data-page="photographs-1"] .music-toggle {
+        .page-panel[data-page="photographs-1"] .portrait-music-toggle {
+            position: absolute;
+            display: block;
             left: 370px;
             top: 55px;
             width: 70px;
@@ -892,6 +893,12 @@
             overscroll-behavior: contain;
         }
 
+        .page-panel[data-page="photographs-3"] {
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+        }
+
         /* Portrait 页面所有组的总容器
            margin-top：控制图库整体离页面顶部多远
            width：控制所有照片总体宽度
@@ -941,6 +948,36 @@
         }
 
         .portrait-tile:hover .portrait-photo {
+            filter: brightness(1.08) saturate(1.04);
+            transform: scale(1.025);
+        }
+
+        .environment-gallery {
+            position: relative;
+            z-index: 2;
+            width: 80vw;
+            margin: 19vh 2vw 12vh auto;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1vw;
+        }
+
+        .environment-tile {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .environment-tile.is-portrait {
+            aspect-ratio: 3 / 4;
+        }
+
+        .environment-tile.is-landscape {
+            aspect-ratio: 4 / 3;
+        }
+
+        .environment-tile:hover .portrait-photo {
             filter: brightness(1.08) saturate(1.04);
             transform: scale(1.025);
         }
@@ -1226,6 +1263,13 @@
                 gap: 2vw;
             }
 
+            .environment-gallery {
+                width: 92vw;
+                margin: 16vh auto 10vh;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 2vw;
+            }
+
             /* 手机端左上角标题位置和大小 */
             .art-title,
             .page-title {
@@ -1471,6 +1515,10 @@
 
             <!-- Portrait 页面图库框架
                  图片会由下面 JS 里的 portraitGroups 自动生成到这里 -->
+            <button class="music-toggle portrait-music-toggle" type="button" data-music-toggle aria-label="Play music" aria-pressed="false">
+                <img src="texture/music_button.png" alt="">
+            </button>
+
             <div class="portrait-gallery" data-portrait-gallery></div>
         </section>
 
@@ -1489,6 +1537,27 @@
             <div class="page-title">
                 <div class="page-title-main">Photograph</div>
                 <div class="page-title-sub">environment</div>
+            </div>
+
+            <div class="environment-gallery">
+                <div class="environment-tile is-landscape">
+                    <img class="portrait-photo" src="texture/environment_1.jpg" alt="Environment photograph 1" loading="lazy" decoding="async">
+                </div>
+                <div class="environment-tile is-landscape">
+                    <img class="portrait-photo" src="texture/environment_2.jpg" alt="Environment photograph 2" loading="lazy" decoding="async">
+                </div>
+                <div class="environment-tile is-landscape">
+                    <img class="portrait-photo" src="texture/environment_3.jpg" alt="Environment photograph 3" loading="lazy" decoding="async">
+                </div>
+                <div class="environment-tile is-portrait">
+                    <img class="portrait-photo" src="texture/environment_4.jpg" alt="Environment photograph 4" loading="lazy" decoding="async">
+                </div>
+                <div class="environment-tile is-landscape">
+                    <img class="portrait-photo" src="texture/environment_5.jpg" alt="Environment photograph 5" loading="lazy" decoding="async">
+                </div>
+                <div class="environment-tile is-landscape">
+                    <img class="portrait-photo" src="texture/environment_6.jpg" alt="Environment photograph 6" loading="lazy" decoding="async">
+                </div>
             </div>
         </section>
 
@@ -1934,6 +2003,31 @@
                         "portrait_group10_7.jpg",
                         "portrait_group10_8.jpg"
                     ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group11_1.jpg",
+                        "portrait_group11_2.jpg",
+                        "portrait_group11_3.jpg",
+                        "portrait_group11_4.jpg",
+                        "portrait_group11_5.jpg",
+                        "portrait_group11_6.jpg",
+                        "portrait_group11_7.jpg",
+                        "portrait_group11_8.jpg",
+                        "portrait_group11_9.jpg",
+                        "portrait_group11_10.jpg",
+                        "portrait_group11_11.jpg",
+                        "portrait_group11_12.jpg",
+                        "portrait_group11_13.jpg",
+                        "portrait_group11_14.jpg",
+                        "portrait_group11_15.jpg",
+                        "portrait_group11_16.jpg",
+                        "portrait_group11_17.jpg",
+                        "portrait_group11_18.jpg",
+                        "portrait_group11_19.jpg",
+                        "portrait_group11_20.jpg"
+                    ]
                 }
             ];
 
@@ -1966,7 +2060,7 @@
                     groupNumber,
                     imageNumber: imageIndex + 1
                 }));
-            });
+            }).reverse();
 
             const getPortraitColumnCount = () => window.matchMedia("(max-width: 640px)").matches ? 2 : 4;
             let currentPortraitColumnCount = 0;
@@ -2026,19 +2120,21 @@
             const photoGroup = document.querySelector("[data-photo-group]");
             const photoLinks = photoGroup ? Array.from(photoGroup.querySelectorAll("a")) : [];
             const music = document.querySelector("[data-site-music]");
-            const musicToggle = document.querySelector("[data-music-toggle]");
+            const musicToggles = Array.from(document.querySelectorAll("[data-music-toggle]"));
             const musicPages = ["index", "aboutme", "photographs-1"];
             let musicShouldPlay = false;
 
             // 同步音乐按钮状态：播放时按钮稍微变暗放大
             const syncMusicButton = () => {
-                if (!music || !musicToggle) {
+                if (!music || musicToggles.length === 0) {
                     return;
                 }
                 const isPlaying = !music.paused;
-                musicToggle.classList.toggle("is-playing", isPlaying);
-                musicToggle.setAttribute("aria-pressed", String(isPlaying));
-                musicToggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+                musicToggles.forEach((toggle) => {
+                    toggle.classList.toggle("is-playing", isPlaying);
+                    toggle.setAttribute("aria-pressed", String(isPlaying));
+                    toggle.setAttribute("aria-label", isPlaying ? "Pause music" : "Play music");
+                });
             };
 
             // 暂停音乐：切到没有音乐的页面时会调用
@@ -2110,27 +2206,29 @@
                 document.body.classList.add("page-ready");
             };
 
-            if (music && musicToggle) {
-                musicToggle.addEventListener("click", async () => {
-                    const activePage = normalizePage();
-                    if (!musicPages.includes(activePage)) {
-                        pauseMusic();
-                        return;
-                    }
-
-                    if (music.paused) {
-                        musicShouldPlay = true;
-                        try {
-                            await music.play();
-                        } catch (error) {
-                            console.warn("Music play was blocked by the browser.", error);
+            if (music && musicToggles.length > 0) {
+                musicToggles.forEach((toggle) => {
+                    toggle.addEventListener("click", async () => {
+                        const activePage = normalizePage();
+                        if (!musicPages.includes(activePage)) {
+                            pauseMusic();
+                            return;
                         }
-                    } else {
-                        musicShouldPlay = false;
-                        music.pause();
-                    }
 
-                    syncMusicButton();
+                        if (music.paused) {
+                            musicShouldPlay = true;
+                            try {
+                                await music.play();
+                            } catch (error) {
+                                console.warn("Music play was blocked by the browser.", error);
+                            }
+                        } else {
+                            musicShouldPlay = false;
+                            music.pause();
+                        }
+
+                        syncMusicButton();
+                    });
                 });
 
                 music.addEventListener("play", syncMusicButton);
