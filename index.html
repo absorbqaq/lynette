@@ -908,32 +908,19 @@
             --portrait-tile-height: clamp(170px, 24vh, 290px);
             --portrait-photo-gap: clamp(10px, 1vw, 18px);
             --portrait-side-padding: clamp(10px, 1vw, 18px);
-            --portrait-max-visible-width: min(1426px, calc(108vh + 7vw));
+            --portrait-max-visible-width: 100%;
             position: relative;
             z-index: 2;
-            width: 80vw;
+            width: 70vw;
             margin: 19vh 2vw 12vh auto;
             display: flex;
             flex-direction: column;
             gap: clamp(54px, 7vh, 92px);
         }
 
-        /* Portrait 单个组：左边红字信息，右边横向滑动照片 */
+        /* Portrait 单个组：只保留横向滑动照片，不显示组标题 */
         .portrait-group {
-            display: grid;
-            grid-template-columns: clamp(86px, 8vw, 150px) minmax(0, 1fr);
-            column-gap: clamp(12px, 1.6vw, 28px);
-            align-items: start;
-        }
-
-        /* 每组左边的红色信息文字，内容去下面 JS 的 portraitGroupInfo 里面改 */
-        .portrait-group-info {
-            color: #ff4747;
-            font-family: "Berkshire Swash", "Playfair Display", serif;
-            font-size: clamp(18px, 1.7vw, 30px);
-            line-height: 1.05;
-            padding-top: 0.22em;
-            word-break: break-word;
+            display: block;
         }
 
         /* 每组右边的照片横滑区域
@@ -1085,20 +1072,127 @@
             transform: scale(0.94);
         }
 
-        .image-hover-preview img {
+        .image-preview-main {
             display: block;
             width: auto;
             height: auto;
             max-width: min(92vw, 1500px);
-            max-height: 90vh;
+            max-height: 74vh;
             object-fit: contain;
             object-position: center;
             transform: scale(0.98);
             transition: transform 0.16s ease;
         }
 
-        .image-hover-preview.is-visible img {
+        .image-hover-preview.is-visible .image-preview-main {
             transform: scale(1);
+        }
+
+        /* 大图左右切换箭头 */
+        .image-preview-arrow {
+            position: absolute;
+            top: 50%;
+            z-index: 3;
+            width: 54px;
+            height: 72px;
+            border: 0;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.22);
+            color: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 54px;
+            line-height: 66px;
+            text-align: center;
+            transform: translateY(-50%);
+            transition: transform 0.16s ease, background 0.16s ease, opacity 0.16s ease;
+        }
+
+        .image-preview-arrow:hover {
+            background: rgba(255, 255, 255, 0.16);
+            transform: translateY(-50%) scale(1.06);
+        }
+
+        .image-preview-arrow:active {
+            transform: translateY(-50%) scale(0.94);
+        }
+
+        .image-preview-arrow:disabled {
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        .image-preview-prev {
+            left: clamp(18px, 4vw, 72px);
+        }
+
+        .image-preview-next {
+            right: clamp(18px, 4vw, 72px);
+        }
+
+        /* 大图底部缩略图：只显示当前组，可以横向滑动 */
+        .image-preview-thumbs {
+            position: absolute;
+            left: 50%;
+            bottom: clamp(10px, 2vh, 20px);
+            z-index: 3;
+            display: flex;
+            gap: 5px;
+            width: min(78vw, 760px);
+            max-height: 52px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 4px 6px 8px;
+            transform: translateX(-50%);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+        }
+
+        .image-preview-thumbs::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .image-preview-thumbs::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .image-preview-thumbs::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 8px;
+        }
+
+        .image-preview-thumbs:empty,
+        .image-preview-arrow.is-hidden {
+            display: none;
+        }
+
+        .image-preview-thumb {
+            flex: 0 0 auto;
+            width: 38px;
+            height: 38px;
+            border: 2px solid rgba(255, 255, 255, 0.28);
+            border-radius: 6px;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            transition: transform 0.16s ease, border-color 0.16s ease, filter 0.16s ease;
+        }
+
+        .image-preview-thumb:hover {
+            transform: translateY(-3px) scale(1.04);
+            filter: brightness(1.12);
+        }
+
+        .image-preview-thumb.is-active {
+            border-color: #fff;
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .image-preview-thumb img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
         }
 
         /* About 页面中间偏左的正文
@@ -1312,21 +1406,36 @@
                 gap: 46px;
             }
 
-            .portrait-group {
-                grid-template-columns: 1fr;
-                row-gap: 8px;
-            }
-
-            .portrait-group-info {
-                font-size: 24px;
-            }
-
             .portrait-strip {
                 width: 100%;
             }
 
             .portrait-tile {
                 height: var(--portrait-tile-height);
+            }
+
+            .image-preview-main {
+                max-width: 90vw;
+                max-height: 66vh;
+            }
+
+            .image-preview-arrow {
+                width: 42px;
+                height: 58px;
+                font-size: 40px;
+                line-height: 52px;
+            }
+
+            .image-preview-thumbs {
+                width: 82vw;
+                max-height: 46px;
+                gap: 4px;
+                padding: 4px 5px 7px;
+            }
+
+            .image-preview-thumb {
+                width: 32px;
+                height: 32px;
             }
 
             .environment-gallery {
@@ -1639,7 +1748,10 @@
     <!-- Portrait 图片悬浮预览：鼠标放到 portrait 小图上时显示完整图片 -->
     <div class="image-hover-preview" data-image-hover-preview aria-hidden="true">
         <button class="image-preview-close" type="button" data-image-preview-close aria-label="Close image">x</button>
-        <img src="" alt="">
+        <button class="image-preview-arrow image-preview-prev" type="button" data-image-preview-prev aria-label="Previous image">&lsaquo;</button>
+        <img class="image-preview-main" src="" alt="">
+        <button class="image-preview-arrow image-preview-next" type="button" data-image-preview-next aria-label="Next image">&rsaquo;</button>
+        <div class="image-preview-thumbs" data-image-preview-thumbs aria-label="Current group thumbnails"></div>
     </div>
 
     <script>
@@ -1690,15 +1802,108 @@
         // 点击 .portrait-photo 后，屏幕中间显示大图；点击半透明背景或按 Esc 关闭。
         (() => {
             const preview = document.querySelector("[data-image-hover-preview]");
-            const previewImage = preview ? preview.querySelector("img") : null;
+            const previewImage = preview ? preview.querySelector(".image-preview-main") : null;
             const closeButton = preview ? preview.querySelector("[data-image-preview-close]") : null;
+            const prevButton = preview ? preview.querySelector("[data-image-preview-prev]") : null;
+            const nextButton = preview ? preview.querySelector("[data-image-preview-next]") : null;
+            const thumbs = preview ? preview.querySelector("[data-image-preview-thumbs]") : null;
             if (!preview || !previewImage) {
                 return;
             }
 
+            let previewItems = [];
+            let previewIndex = 0;
+
+            const getPreviewSource = (image) => image.currentSrc || image.src;
+
+            const syncPreviewControls = () => {
+                const hasGroup = previewItems.length > 1;
+                if (prevButton) {
+                    prevButton.classList.toggle("is-hidden", !hasGroup);
+                    prevButton.disabled = !hasGroup;
+                }
+                if (nextButton) {
+                    nextButton.classList.toggle("is-hidden", !hasGroup);
+                    nextButton.disabled = !hasGroup;
+                }
+                if (thumbs && !hasGroup) {
+                    thumbs.innerHTML = "";
+                }
+            };
+
+            const renderPreviewThumbs = () => {
+                if (!thumbs) {
+                    return;
+                }
+
+                thumbs.innerHTML = "";
+                if (previewItems.length <= 1) {
+                    return;
+                }
+
+                previewItems.forEach((item, index) => {
+                    const button = document.createElement("button");
+                    const image = document.createElement("img");
+
+                    button.className = "image-preview-thumb";
+                    button.type = "button";
+                    button.setAttribute("aria-label", "Open image " + (index + 1));
+                    button.addEventListener("click", (event) => {
+                        event.stopPropagation();
+                        showPreviewImage(index);
+                    });
+
+                    image.src = item.src;
+                    image.alt = item.alt;
+                    image.loading = "lazy";
+                    image.decoding = "async";
+
+                    button.appendChild(image);
+                    thumbs.appendChild(button);
+                });
+            };
+
+            const syncActiveThumb = () => {
+                if (!thumbs) {
+                    return;
+                }
+
+                const buttons = Array.from(thumbs.querySelectorAll(".image-preview-thumb"));
+                buttons.forEach((button, index) => {
+                    button.classList.toggle("is-active", index === previewIndex);
+                    button.setAttribute("aria-current", index === previewIndex ? "true" : "false");
+                });
+
+                const activeButton = buttons[previewIndex];
+                if (activeButton) {
+                    activeButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                }
+            };
+
+            const showPreviewImage = (index) => {
+                if (previewItems.length === 0) {
+                    return;
+                }
+
+                previewIndex = (index + previewItems.length) % previewItems.length;
+                const item = previewItems[previewIndex];
+                previewImage.src = item.src;
+                previewImage.alt = item.alt;
+                syncActiveThumb();
+            };
+
             const openPreview = (image) => {
-                previewImage.src = image.currentSrc || image.src;
-                previewImage.alt = image.alt || "";
+                const groupStrip = image.closest(".portrait-strip");
+                const groupImages = groupStrip ? Array.from(groupStrip.querySelectorAll(".portrait-photo")) : [image];
+                previewItems = groupImages.map((groupImage) => ({
+                    src: getPreviewSource(groupImage),
+                    alt: groupImage.alt || ""
+                }));
+                previewIndex = Math.max(0, groupImages.indexOf(image));
+
+                renderPreviewThumbs();
+                syncPreviewControls();
+                showPreviewImage(previewIndex);
                 preview.classList.add("is-visible");
                 preview.setAttribute("aria-hidden", "false");
             };
@@ -1706,6 +1911,18 @@
             const closePreview = () => {
                 preview.classList.remove("is-visible");
                 preview.setAttribute("aria-hidden", "true");
+            };
+
+            const showPreviousImage = () => {
+                if (previewItems.length > 1) {
+                    showPreviewImage(previewIndex - 1);
+                }
+            };
+
+            const showNextImage = () => {
+                if (previewItems.length > 1) {
+                    showPreviewImage(previewIndex + 1);
+                }
             };
 
             document.addEventListener("click", (event) => {
@@ -1726,9 +1943,34 @@
                 closeButton.addEventListener("click", closePreview);
             }
 
+            if (prevButton) {
+                prevButton.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    showPreviousImage();
+                });
+            }
+
+            if (nextButton) {
+                nextButton.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    showNextImage();
+                });
+            }
+
             document.addEventListener("keydown", (event) => {
+                const isOpen = preview.classList.contains("is-visible");
+                if (!isOpen) {
+                    return;
+                }
+
                 if (event.key === "Escape") {
                     closePreview();
+                } else if (event.key === "ArrowLeft") {
+                    event.preventDefault();
+                    showPreviousImage();
+                } else if (event.key === "ArrowRight") {
+                    event.preventDefault();
+                    showNextImage();
                 }
             });
 
@@ -1951,25 +2193,23 @@
         // 以后照片命名建议：portrait_group1_1.jpg / portrait_group1_2.jpg / portrait_group2_1.jpg ...
         // 只需要把文件名放进下面 portraitGroups 里，就会自动按组生成 masonry 图片布局。
         (() => {
-            // 这里改每一组左边的红色说明文字：
-            // 第 1 行对应 portrait_group1_x，第 2 行对应 portrait_group2_x，以此类推。
-            // 想空着就把对应文字改成 ""。
-            const portraitGroupInfo = [
-                "Group 01",
-                "Group 02",
-                "Group 03",
-                "Group 04",
-                "Group 05",
-                "Group 06",
-                "Group 07",
-                "Group 08",
-                "Group 09",
-                "Group 10",
-                "Group 11"
-            ];
+            // 这里自定义 portrait 组的上下顺序：
+            // 数字代表 group 编号。比如 [14, 13, 12, 11] 就是 group14 在最上面。
+            // 新增组后，把新组编号加进来就可以自由排序。
+            const portraitGroupOrder = [11, 13, 12, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
-            // true：最新的组和图片排在最上面/最左边；false：从 group1 开始正序排。
-            const showNewestPortraitFirst = true;
+            // 默认照片顺序：true = 每组倒序，false = 每组正序。
+            const showNewestPortraitImageFirst = true;
+
+            // 单独控制某一组的照片顺序：
+            // "normal" = 正序，比如 group13_1 在最左边
+            // "reverse" = 倒序，比如 group13_7 在最左边
+            // 没写到这里的组，会使用上面的默认顺序。
+            const portraitGroupImageOrder = {
+                13: "normal",
+                12: "normal",
+                11: "normal"
+            };
 
             const portraitGroups = [
                 {
@@ -2114,6 +2354,37 @@
                         "portrait_group11_19.jpg",
                         "portrait_group11_20.jpg"
                     ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group12_1.jpg",
+                        "portrait_group12_2.jpg",
+                        "portrait_group12_3.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group13_1.jpg",
+                        "portrait_group13_2.jpg",
+                        "portrait_group13_3.jpg",
+                        "portrait_group13_4.jpg",
+                        "portrait_group13_5.jpg",
+                        "portrait_group13_6.jpg",
+                        "portrait_group13_7.jpg"
+                    ]
+                },
+                {
+                    title: "",
+                    images: [
+                        "portrait_group14_1.jpg",
+                        "portrait_group14_2.jpg",
+                        "portrait_group14_3.jpg",
+                        "portrait_group14_4.jpg",
+                        "portrait_group14_5.jpg",
+                        "portrait_group14_6.jpg"
+                    ]
                 }
             ];
 
@@ -2137,8 +2408,6 @@
                 tile.classList.toggle("is-portrait", isPortrait);
                 tile.classList.toggle("is-landscape", !isPortrait);
             };
-
-            const getPortraitGroupInfo = (groupNumber) => portraitGroupInfo[groupNumber - 1] || "Group " + String(groupNumber).padStart(2, "0");
 
             const createPortraitTile = (group, groupNumber, fileName, imageNumber) => {
                 const tile = document.createElement("div");
@@ -2190,24 +2459,23 @@
             const renderPortraitGallery = () => {
                 gallery.innerHTML = "";
 
-                const orderedGroups = portraitGroups.map((group, groupIndex) => ({
+                const groupsByNumber = new Map(portraitGroups.map((group, groupIndex) => [
+                    groupIndex + 1,
                     group,
-                    groupNumber: groupIndex + 1
-                }));
-                if (showNewestPortraitFirst) {
-                    orderedGroups.reverse();
-                }
+                ]));
+                const orderedGroups = portraitGroupOrder
+                    .map((groupNumber) => ({
+                        group: groupsByNumber.get(groupNumber),
+                        groupNumber
+                    }))
+                    .filter((item) => item.group);
 
                 orderedGroups.forEach(({ group, groupNumber }) => {
                     const groupEl = document.createElement("section");
-                    const info = document.createElement("div");
                     const strip = document.createElement("div");
 
                     groupEl.className = "portrait-group";
                     groupEl.dataset.group = String(groupNumber);
-
-                    info.className = "portrait-group-info";
-                    info.textContent = getPortraitGroupInfo(groupNumber);
 
                     strip.className = "portrait-strip";
                     strip.setAttribute("aria-label", "Portrait group " + groupNumber);
@@ -2217,7 +2485,8 @@
                         fileName,
                         imageNumber: imageIndex + 1
                     }));
-                    if (showNewestPortraitFirst) {
+                    const imageOrder = portraitGroupImageOrder[groupNumber] || (showNewestPortraitImageFirst ? "reverse" : "normal");
+                    if (imageOrder === "reverse") {
                         orderedImages.reverse();
                     }
 
@@ -2225,7 +2494,6 @@
                         strip.appendChild(createPortraitTile(group, groupNumber, fileName, imageNumber));
                     });
 
-                    groupEl.appendChild(info);
                     groupEl.appendChild(strip);
                     gallery.appendChild(groupEl);
                 });
