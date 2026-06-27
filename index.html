@@ -248,10 +248,10 @@
            bottom：离底部多远，数值越大越往上
            width / height：按钮大小 */
         html[data-page="index"] .music-toggle {
-            left: 1270px;
-            bottom: 147px;
-            width: 122px;
-            height: 122px;
+            left: 83.2vw;
+            bottom: 28.6vh;
+            width: 6.35vw;
+            height: 6.35vw;
         }
 
         /* About me 页面音乐按钮位置
@@ -259,10 +259,10 @@
            bottom：离底部多远，数值越大越往上
            width / height：按钮大小 */
         html[data-page="aboutme"] .music-toggle {
-            left: 237px;
-            bottom: 622px;
-            width: 72px;
-            height: 60px;
+            left: 14.85vw;
+            bottom: 85.6vh;
+            width: 3.75vw;
+            height: 3.125vw;
         }
 
         /* Portrait 页面音乐按钮位置
@@ -904,20 +904,68 @@
            width：控制所有照片总体宽度
            gap：控制组和组之间的上下间隔，所有组都统一 */
         .portrait-gallery {
+            /* 这里控制每组照片大小和最多可视宽度 */
+            --portrait-tile-height: clamp(170px, 24vh, 290px);
+            --portrait-photo-gap: clamp(10px, 1vw, 18px);
+            --portrait-side-padding: clamp(10px, 1vw, 18px);
+            --portrait-max-visible-width: min(1426px, calc(108vh + 7vw));
             position: relative;
             z-index: 2;
             width: 80vw;
             margin: 19vh 2vw 12vh auto;
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            align-items: start;
-            gap: 1vw;
-        }
-
-        .portrait-column {
             display: flex;
             flex-direction: column;
-            gap: 1vw;
+            gap: clamp(54px, 7vh, 92px);
+        }
+
+        /* Portrait 单个组：左边红字信息，右边横向滑动照片 */
+        .portrait-group {
+            display: grid;
+            grid-template-columns: clamp(86px, 8vw, 150px) minmax(0, 1fr);
+            column-gap: clamp(12px, 1.6vw, 28px);
+            align-items: start;
+        }
+
+        /* 每组左边的红色信息文字，内容去下面 JS 的 portraitGroupInfo 里面改 */
+        .portrait-group-info {
+            color: #ff4747;
+            font-family: "Berkshire Swash", "Playfair Display", serif;
+            font-size: clamp(18px, 1.7vw, 30px);
+            line-height: 1.05;
+            padding-top: 0.22em;
+            word-break: break-word;
+        }
+
+        /* 每组右边的照片横滑区域
+           gap：控制同一组里照片之间的左右间隔
+           padding-left / padding-right：控制照片带左右留白 */
+        .portrait-strip {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--portrait-photo-gap);
+            width: min(100%, var(--portrait-max-visible-width));
+            min-width: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0 var(--portrait-side-padding) 10px;
+            scroll-snap-type: x proximity;
+            overscroll-behavior-x: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+        }
+
+        .portrait-strip::-webkit-scrollbar {
+            height: 7px;
+        }
+
+        .portrait-strip::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .portrait-strip::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.28);
+            border-radius: 8px;
         }
 
         /* Portrait 单张图片外框
@@ -925,9 +973,11 @@
            图片会裁剪填满外框 */
         .portrait-tile {
             display: block;
-            width: 100%;
+            flex: 0 0 auto;
+            height: var(--portrait-tile-height);
             overflow: hidden;
             background: transparent;
+            scroll-snap-align: start;
         }
 
         .portrait-tile.is-portrait {
@@ -1253,14 +1303,30 @@
 
             /* 手机端 Portrait 页面图库 */
             .portrait-gallery {
+                --portrait-tile-height: clamp(150px, 26vh, 230px);
+                --portrait-photo-gap: 12px;
+                --portrait-side-padding: 12px;
+                --portrait-max-visible-width: 100%;
                 width: 92vw;
                 margin: 16vh auto 10vh;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 2vw;
+                gap: 46px;
             }
 
-            .portrait-column {
-                gap: 2vw;
+            .portrait-group {
+                grid-template-columns: 1fr;
+                row-gap: 8px;
+            }
+
+            .portrait-group-info {
+                font-size: 24px;
+            }
+
+            .portrait-strip {
+                width: 100%;
+            }
+
+            .portrait-tile {
+                height: var(--portrait-tile-height);
             }
 
             .environment-gallery {
@@ -1885,6 +1951,26 @@
         // 以后照片命名建议：portrait_group1_1.jpg / portrait_group1_2.jpg / portrait_group2_1.jpg ...
         // 只需要把文件名放进下面 portraitGroups 里，就会自动按组生成 masonry 图片布局。
         (() => {
+            // 这里改每一组左边的红色说明文字：
+            // 第 1 行对应 portrait_group1_x，第 2 行对应 portrait_group2_x，以此类推。
+            // 想空着就把对应文字改成 ""。
+            const portraitGroupInfo = [
+                "Group 01",
+                "Group 02",
+                "Group 03",
+                "Group 04",
+                "Group 05",
+                "Group 06",
+                "Group 07",
+                "Group 08",
+                "Group 09",
+                "Group 10",
+                "Group 11"
+            ];
+
+            // true：最新的组和图片排在最上面/最左边；false：从 group1 开始正序排。
+            const showNewestPortraitFirst = true;
+
             const portraitGroups = [
                 {
                     title: "",
@@ -2052,62 +2138,100 @@
                 tile.classList.toggle("is-landscape", !isPortrait);
             };
 
-            const portraitItems = portraitGroups.flatMap((group, groupIndex) => {
-                const groupNumber = groupIndex + 1;
-                return group.images.map((fileName, imageIndex) => ({
-                    fileName,
-                    group,
-                    groupNumber,
-                    imageNumber: imageIndex + 1
-                }));
-            }).reverse();
+            const getPortraitGroupInfo = (groupNumber) => portraitGroupInfo[groupNumber - 1] || "Group " + String(groupNumber).padStart(2, "0");
 
-            const getPortraitColumnCount = () => window.matchMedia("(max-width: 640px)").matches ? 2 : 4;
-            let currentPortraitColumnCount = 0;
+            const createPortraitTile = (group, groupNumber, fileName, imageNumber) => {
+                const tile = document.createElement("div");
+                const img = document.createElement("img");
 
-            const renderPortraitGallery = () => {
-                const columnCount = getPortraitColumnCount();
-                if (columnCount === currentPortraitColumnCount && gallery.children.length > 0) {
-                    return;
+                tile.className = "portrait-tile is-portrait";
+                tile.dataset.group = String(groupNumber);
+                tile.dataset.image = String(imageNumber);
+
+                img.className = "portrait-photo";
+                img.src = imagePath(fileName);
+                img.alt = group.title ? group.title + " portrait " + imageNumber : "Portrait " + imageNumber;
+                img.loading = "lazy";
+                img.decoding = "async";
+
+                if (img.complete) {
+                    setPortraitTileRatio(tile, img);
+                } else {
+                    img.addEventListener("load", () => setPortraitTileRatio(tile, img), { once: true });
                 }
 
-                currentPortraitColumnCount = columnCount;
-                gallery.innerHTML = "";
+                tile.appendChild(img);
+                return tile;
+            };
 
-                const columns = Array.from({ length: columnCount }, () => {
-                    const column = document.createElement("div");
-                    column.className = "portrait-column";
-                    gallery.appendChild(column);
-                    return column;
-                });
-
-                portraitItems.forEach((item, itemIndex) => {
-                    const tile = document.createElement("div");
-                    const img = document.createElement("img");
-
-                    tile.className = "portrait-tile is-portrait";
-                    tile.dataset.group = String(item.groupNumber);
-                    tile.dataset.image = String(item.imageNumber);
-
-                    img.className = "portrait-photo";
-                    img.src = imagePath(item.fileName);
-                    img.alt = item.group.title ? item.group.title + " portrait " + item.imageNumber : "Portrait " + item.imageNumber;
-                    img.loading = "lazy";
-                    img.decoding = "async";
-
-                    if (img.complete) {
-                        setPortraitTileRatio(tile, img);
-                    } else {
-                        img.addEventListener("load", () => setPortraitTileRatio(tile, img), { once: true });
+            const addHorizontalWheel = (strip) => {
+                strip.addEventListener("wheel", (event) => {
+                    const maxScroll = strip.scrollWidth - strip.clientWidth;
+                    if (maxScroll <= 0) {
+                        return;
                     }
 
-                    tile.appendChild(img);
-                    columns[itemIndex % columnCount].appendChild(tile);
+                    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+                    if (delta === 0) {
+                        return;
+                    }
+
+                    const atStart = strip.scrollLeft <= 0;
+                    const atEnd = strip.scrollLeft >= maxScroll - 1;
+                    if ((delta < 0 && atStart) || (delta > 0 && atEnd)) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    strip.scrollLeft = Math.max(0, Math.min(maxScroll, strip.scrollLeft + delta));
+                }, { passive: false });
+            };
+
+            const renderPortraitGallery = () => {
+                gallery.innerHTML = "";
+
+                const orderedGroups = portraitGroups.map((group, groupIndex) => ({
+                    group,
+                    groupNumber: groupIndex + 1
+                }));
+                if (showNewestPortraitFirst) {
+                    orderedGroups.reverse();
+                }
+
+                orderedGroups.forEach(({ group, groupNumber }) => {
+                    const groupEl = document.createElement("section");
+                    const info = document.createElement("div");
+                    const strip = document.createElement("div");
+
+                    groupEl.className = "portrait-group";
+                    groupEl.dataset.group = String(groupNumber);
+
+                    info.className = "portrait-group-info";
+                    info.textContent = getPortraitGroupInfo(groupNumber);
+
+                    strip.className = "portrait-strip";
+                    strip.setAttribute("aria-label", "Portrait group " + groupNumber);
+                    addHorizontalWheel(strip);
+
+                    const orderedImages = group.images.map((fileName, imageIndex) => ({
+                        fileName,
+                        imageNumber: imageIndex + 1
+                    }));
+                    if (showNewestPortraitFirst) {
+                        orderedImages.reverse();
+                    }
+
+                    orderedImages.forEach(({ fileName, imageNumber }) => {
+                        strip.appendChild(createPortraitTile(group, groupNumber, fileName, imageNumber));
+                    });
+
+                    groupEl.appendChild(info);
+                    groupEl.appendChild(strip);
+                    gallery.appendChild(groupEl);
                 });
             };
 
             renderPortraitGallery();
-            window.addEventListener("resize", renderPortraitGallery);
         })();
 
         // 单页切换逻辑：通过地址栏里的 #hash 切换五个页面状态
