@@ -940,6 +940,12 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: rgba(255, 255, 255, 0.32) transparent;
+            touch-action: pan-y;
+            user-select: none;
+        }
+
+        .portrait-strip.is-dragging {
+            scroll-snap-type: none;
         }
 
         .portrait-strip::-webkit-scrollbar {
@@ -1928,6 +1934,12 @@
             document.addEventListener("click", (event) => {
                 const image = event.target.closest(".portrait-photo");
                 if (image) {
+                    const strip = image.closest(".portrait-strip");
+                    if (strip && strip.classList.contains("is-dragging-click")) {
+                        event.preventDefault();
+                        return;
+                    }
+
                     event.preventDefault();
                     openPreview(image);
                 }
@@ -2196,10 +2208,10 @@
             // 这里自定义 portrait 组的上下顺序：
             // 数字代表 group 编号。比如 [14, 13, 12, 11] 就是 group14 在最上面。
             // 新增组后，把新组编号加进来就可以自由排序。
-            const portraitGroupOrder = [11, 13, 12, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+            const portraitGroupOrder = [11,14, 13, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
             // 默认照片顺序：true = 每组倒序，false = 每组正序。
-            const showNewestPortraitImageFirst = true;
+            const showNewestPortraitImageFirst = false;
 
             // 单独控制某一组的照片顺序：
             // "normal" = 正序，比如 group13_1 在最左边
@@ -2207,8 +2219,9 @@
             // 没写到这里的组，会使用上面的默认顺序。
             const portraitGroupImageOrder = {
                 13: "normal",
-                12: "normal",
-                11: "normal"
+                11: "reverse",
+                12: "normal"
+                
             };
 
             const portraitGroups = [
@@ -2422,6 +2435,7 @@
                 img.alt = group.title ? group.title + " portrait " + imageNumber : "Portrait " + imageNumber;
                 img.loading = "lazy";
                 img.decoding = "async";
+                img.draggable = false;
 
                 if (img.complete) {
                     setPortraitTileRatio(tile, img);
@@ -2454,6 +2468,59 @@
                     event.preventDefault();
                     strip.scrollLeft = Math.max(0, Math.min(maxScroll, strip.scrollLeft + delta));
                 }, { passive: false });
+
+                let isDragging = false;
+                let dragStartX = 0;
+                let dragStartScrollLeft = 0;
+                let dragMoved = false;
+
+                strip.addEventListener("pointerdown", (event) => {
+                    if (event.button !== 0 || strip.scrollWidth <= strip.clientWidth) {
+                        return;
+                    }
+
+                    isDragging = true;
+                    dragMoved = false;
+                    dragStartX = event.clientX;
+                    dragStartScrollLeft = strip.scrollLeft;
+                    strip.classList.add("is-dragging");
+                    strip.setPointerCapture(event.pointerId);
+                });
+
+                strip.addEventListener("pointermove", (event) => {
+                    if (!isDragging) {
+                        return;
+                    }
+
+                    const distance = event.clientX - dragStartX;
+                    if (Math.abs(distance) > 4) {
+                        dragMoved = true;
+                    }
+
+                    strip.scrollLeft = dragStartScrollLeft - distance;
+                });
+
+                const endDrag = (event) => {
+                    if (!isDragging) {
+                        return;
+                    }
+
+                    isDragging = false;
+                    strip.classList.remove("is-dragging");
+                    if (strip.hasPointerCapture(event.pointerId)) {
+                        strip.releasePointerCapture(event.pointerId);
+                    }
+
+                    if (dragMoved) {
+                        strip.classList.add("is-dragging-click");
+                        window.setTimeout(() => {
+                            strip.classList.remove("is-dragging-click");
+                        }, 0);
+                    }
+                };
+
+                strip.addEventListener("pointerup", endDrag);
+                strip.addEventListener("pointercancel", endDrag);
             };
 
             const renderPortraitGallery = () => {
